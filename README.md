@@ -99,3 +99,4 @@ npm run dev:web
 - `npm run dev:web` - Run web interface (http://localhost:8080)
 - `npm run build` - Build all components
 - `npm run migrate` - Run database migrations (for SQLite)
+- `sqlite3 ccm-registry.db < scripts/seed-data.sql` - Seed database with example commands

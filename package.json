@@ -25,7 +25,13 @@
     "dev:reset": "docker-compose down -v && ./scripts/dev.sh",
     "dev:logs": "docker-compose logs -f"
   },
-  "keywords": ["claude", "ai", "commands", "package-manager", "monorepo"],
+  "keywords": [
+    "claude",
+    "ai",
+    "commands",
+    "package-manager",
+    "monorepo"
+  ],
   "author": "",
   "license": "MIT",
   "engines": {
