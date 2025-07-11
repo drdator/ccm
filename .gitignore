@@ -1,8 +1,10 @@
 # Dependencies
 node_modules/
+*/node_modules/
 
 # Build output
 dist/
+*/dist/
 *.js
 *.js.map
 *.d.ts
@@ -23,6 +25,7 @@ npm-debug.log*
 # Environment
 .env
 .env.local
+api/.env
 
 # Test coverage
 coverage/
@@ -30,3 +33,7 @@ coverage/
 # Temporary files
 *.tmp
 .cache/
+
+# Lock files (use npm-shrinkwrap.json if needed)
+package-lock.json
+*/package-lock.json
