@@ -29,15 +29,8 @@ CCM will manage Claude Code commands with separation between user-created and in
   "dependencies": {
     "git-helper": "^1.2.0",
     "code-review": "^2.0.0",
-    "sql-formatter": "~1.0.0"
-  },
-  "devDependencies": {
+    "sql-formatter": "~1.0.0",
     "test-utils": "^1.0.0"
-  },
-  "ccm": {
-    "registry": "https://registry.ccm.dev",
-    "installed": "./installed",
-    "commands": "./commands"
   }
 }
 ```

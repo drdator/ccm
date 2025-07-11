@@ -44,37 +44,41 @@ This is a monorepo containing:
 
 ## Quick Start
 
-### CLI Development
+### Try the Example Package
 ```bash
-# Install dependencies
+# Install the CLI globally
+cd cli
+npm run build
+npm link
+
+# Test with the example package
+cd ../example-commands
+ccm publish --dry    # Preview
+ccm publish          # Actually publish
+
+# Install it somewhere else
+cd /tmp && mkdir test && cd test
+ccm install hello-world
+ccm list
+```
+
+### Development Setup
+
+#### CLI Development
+```bash
 npm install
-
-# Run CLI in development mode
-npm run dev:cli
-
-# Build CLI
 npm run build:cli
 ```
 
-### API Development
+#### API Development  
 ```bash
-# Install dependencies
 npm install
-
-# Set up environment
-cp api/.env.example api/.env
-# Edit api/.env with your configuration
-
-# Run database migrations
-npm run migrate
-
-# Run API in development mode
-npm run dev:api
+npm run dev:api    # Starts with SQLite (no Docker needed)
 ```
 
 ## Commands
 
 - `npm run dev:cli` - Run CLI in development mode
-- `npm run dev:api` - Run API server in development mode
+- `npm run dev:api` - Run API server (auto-creates SQLite DB)
 - `npm run build` - Build both CLI and API
-- `npm run migrate` - Run database migrations
+- `npm run migrate` - Run database migrations (for SQLite)

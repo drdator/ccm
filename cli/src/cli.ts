@@ -91,9 +91,9 @@ program
 program
   .command('list')
   .alias('ls')
-  .description('List all installed Claude commands')
+  .description('List available Claude commands')
   .option('-l, --local', 'Show only local commands', false)
-  .option('-g, --global', 'Show only global commands', false)
+  .option('-i, --installed', 'Show only installed commands', false)
   .action(async (options) => {
     try {
       await list(options);

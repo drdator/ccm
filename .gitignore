@@ -34,8 +34,11 @@ coverage/
 *.tmp
 .cache/
 
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
 # Lock files (use npm-shrinkwrap.json if needed)
 package-lock.json
 */package-lock.json
-
-ccm-registry.db

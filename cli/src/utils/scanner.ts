@@ -1,19 +1,18 @@
 import { glob } from 'glob';
-import { homedir } from 'os';
 import { join } from 'path';
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, readdirSync, lstatSync } from 'fs';
 import { Command, CommandFile } from '../types/command.js';
 import { parseCommandFile } from './parser.js';
 
-export async function scanCommands(options: { local?: boolean; global?: boolean } = {}): Promise<Command[]> {
+export async function scanCommands(options: { local?: boolean; installed?: boolean } = {}): Promise<Command[]> {
   const commands: Command[] = [];
   const scannedPaths = new Set<string>();
 
   // Determine which locations to scan
-  const scanLocal = options.local || (!options.local && !options.global);
-  const scanGlobal = options.global || (!options.local && !options.global);
+  const scanLocal = options.local || (!options.local && !options.installed);
+  const scanInstalled = options.installed || (!options.local && !options.installed);
 
-  // Scan local .claude/commands directory
+  // Scan for user-created commands (local to this project)
   if (scanLocal) {
     const localPath = join(process.cwd(), '.claude', 'commands');
     if (existsSync(localPath)) {
@@ -27,12 +26,12 @@ export async function scanCommands(options: { local?: boolean; global?: boolean 
     }
   }
 
-  // Scan global ~/.claude/commands directory
-  if (scanGlobal) {
-    const globalPath = join(homedir(), '.claude', 'commands');
-    if (existsSync(globalPath)) {
-      const globalCommands = await scanDirectory(globalPath, 'global');
-      globalCommands.forEach(cmd => {
+  // Scan for installed command packages
+  if (scanInstalled) {
+    const installedPath = join(process.cwd(), '.claude', 'installed');
+    if (existsSync(installedPath)) {
+      const installedCommands = await scanInstalledPackages(installedPath);
+      installedCommands.forEach(cmd => {
         if (!scannedPaths.has(cmd.name)) {
           commands.push(cmd);
           scannedPaths.add(cmd.name);
@@ -44,7 +43,7 @@ export async function scanCommands(options: { local?: boolean; global?: boolean 
   return commands;
 }
 
-async function scanDirectory(basePath: string, location: 'local' | 'global'): Promise<Command[]> {
+async function scanDirectory(basePath: string, location: 'local' | 'installed'): Promise<Command[]> {
   const commands: Command[] = [];
   
   // Find all .md files in the directory (including subdirectories for namespacing)
@@ -61,7 +60,7 @@ async function scanDirectory(basePath: string, location: 'local' | 'global'): Pr
       
       // Extract command name from file path
       const relativePath = filePath.replace(basePath + '/', '');
-      const name = relativePath.replace(/\.md$/, '').replace(/\//g, ':');
+      const name = relativePath.replace(/\.md$/, '').replace(/\//g, '/');
 
       commands.push({
         name,
@@ -76,6 +75,34 @@ async function scanDirectory(basePath: string, location: 'local' | 'global'): Pr
     } catch (error) {
       console.warn(`Warning: Failed to parse command file ${filePath}:`, error instanceof Error ? error.message : String(error));
     }
+  }
+
+  return commands;
+}
+
+async function scanInstalledPackages(installedPath: string): Promise<Command[]> {
+  const commands: Command[] = [];
+  
+  try {
+    const packageDirs = readdirSync(installedPath).filter(name => {
+      const fullPath = join(installedPath, name);
+      return lstatSync(fullPath).isDirectory() && name !== '.ccm-metadata.json';
+    });
+
+    for (const packageName of packageDirs) {
+      const packagePath = join(installedPath, packageName);
+      const packageCommands = await scanDirectory(packagePath, 'installed');
+      
+      // Add package namespace to command names
+      packageCommands.forEach(cmd => {
+        cmd.name = `${packageName}/${cmd.name}`;
+        cmd.metadata.package = packageName;
+      });
+      
+      commands.push(...packageCommands);
+    }
+  } catch (error) {
+    console.warn(`Warning: Failed to scan installed packages:`, error instanceof Error ? error.message : String(error));
   }
 
   return commands;

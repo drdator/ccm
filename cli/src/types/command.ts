@@ -5,12 +5,13 @@ export interface CommandMetadata {
   author?: string;
   tags?: string[];
   arguments?: boolean;
+  package?: string;
 }
 
 export interface Command {
   name: string;
   path: string;
-  location: 'local' | 'global';
+  location: 'local' | 'installed';
   metadata: CommandMetadata;
   content: string;
 }

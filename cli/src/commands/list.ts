@@ -2,35 +2,35 @@ import chalk from 'chalk';
 import { scanCommands } from '../utils/scanner.js';
 import { Command } from '../types/command.js';
 
-export async function list(options: { local?: boolean; global?: boolean }) {
+export async function list(options: { local?: boolean; installed?: boolean }) {
   console.log(chalk.blue('Scanning for Claude commands...\n'));
 
   const commands = await scanCommands(options);
 
   if (commands.length === 0) {
     console.log(chalk.yellow('No commands found.'));
-    console.log(chalk.gray('\nTo install commands, use: ccm install <command>'));
-    console.log(chalk.gray('To create a command, place a .md file in .claude/commands/'));
+    console.log(chalk.gray('\nTo install commands, use: ccm install <package>'));
+    console.log(chalk.gray('To create commands, place .md files in .claude/commands/'));
     return;
   }
 
   // Group commands by location
   const localCommands = commands.filter(cmd => cmd.location === 'local');
-  const globalCommands = commands.filter(cmd => cmd.location === 'global');
+  const installedCommands = commands.filter(cmd => cmd.location === 'installed');
 
   // Display local commands
-  if (localCommands.length > 0 && (options.local || !options.global)) {
+  if (localCommands.length > 0 && (options.local || !options.installed)) {
     console.log(chalk.green('Local Commands:'));
     displayCommands(localCommands);
-    if (globalCommands.length > 0 && !options.local) {
+    if (installedCommands.length > 0 && !options.local) {
       console.log(''); // Add spacing
     }
   }
 
-  // Display global commands
-  if (globalCommands.length > 0 && (options.global || !options.local)) {
-    console.log(chalk.green('Global Commands:'));
-    displayCommands(globalCommands);
+  // Display installed commands
+  if (installedCommands.length > 0 && (options.installed || !options.local)) {
+    console.log(chalk.green('Installed Commands:'));
+    displayCommands(installedCommands);
   }
 
   // Display summary

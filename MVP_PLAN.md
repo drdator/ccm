@@ -54,15 +54,8 @@ CCM integrates with Claude Code's existing command system (`.claude/commands/`),
   "description": "Commands for my project",
   "dependencies": {
     "git-helper": "^1.2.0",
-    "code-review": "^2.0.0"
-  },
-  "devDependencies": {
+    "code-review": "^2.0.0",
     "test-utils": "^1.0.0"
-  },
-  "ccm": {
-    "registry": "https://registry.ccm.dev",
-    "installed": "./installed",
-    "commands": "./commands"
   }
 }
 ```
