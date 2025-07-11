@@ -1,5 +1,8 @@
 import { Router } from 'express';
-import { CommandModel } from '../models/Command.js';
+// Use SQLite models for local development
+const CommandModel = process.env.NODE_ENV === 'production'
+  ? (await import('../models/Command.js')).CommandModel
+  : (await import('../models/Command-sqlite.js')).CommandModel;
 import { ApiError } from '../middleware/errorHandler.js';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
 import { parseCommandYaml } from '../utils/validation.js';

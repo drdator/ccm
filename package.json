@@ -15,7 +15,12 @@
     "build:api": "npm run build --workspace=api",
     "start:cli": "npm run start --workspace=cli",
     "start:api": "npm run start --workspace=api",
-    "migrate": "npm run migrate --workspace=api"
+    "migrate": "npm run migrate --workspace=api",
+    "dev:setup": "./scripts/dev.sh",
+    "dev:start": "docker-compose up -d",
+    "dev:stop": "docker-compose down",
+    "dev:reset": "docker-compose down -v && ./scripts/dev.sh",
+    "dev:logs": "docker-compose logs -f"
   },
   "keywords": ["claude", "ai", "commands", "package-manager", "monorepo"],
   "author": "",

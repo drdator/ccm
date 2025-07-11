@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
-import { UserModel } from '../models/User.js';
+// Use SQLite models for local development
+const UserModel = process.env.NODE_ENV === 'production' 
+  ? (await import('../models/User.js')).UserModel
+  : (await import('../models/User-sqlite.js')).UserModel;
 import { ApiError } from '../middleware/errorHandler.js';
 import { authenticateToken, AuthRequest } from '../middleware/auth.js';
 
@@ -39,9 +42,10 @@ router.post('/register', async (req, res, next) => {
     const user = await UserModel.create(username, email, password);
 
     // Generate JWT
+    const jwtSecret = process.env.JWT_SECRET || 'fallback-secret-key';
     const token = jwt.sign(
       { id: user.id, username: user.username, email: user.email },
-      process.env.JWT_SECRET!,
+      jwtSecret,
       { expiresIn: process.env.JWT_EXPIRY || '7d' }
     );
 
@@ -82,9 +86,10 @@ router.post('/login', async (req, res, next) => {
     }
 
     // Generate JWT
+    const jwtSecret = process.env.JWT_SECRET || 'fallback-secret-key';
     const token = jwt.sign(
       { id: user.id, username: user.username, email: user.email },
-      process.env.JWT_SECRET!,
+      jwtSecret,
       { expiresIn: process.env.JWT_EXPIRY || '7d' }
     );
 

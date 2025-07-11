@@ -10,6 +10,13 @@ import commandRoutes from './routes/commands.js';
 // Load environment variables
 dotenv.config();
 
+// Initialize database (SQLite for local development)
+if (process.env.NODE_ENV !== 'production') {
+  import('./config/database-sqlite.js').then(({ initializeDatabase }) => {
+    initializeDatabase().catch(console.error);
+  });
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 

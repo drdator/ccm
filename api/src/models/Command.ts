@@ -113,7 +113,7 @@ export class CommandModel {
   static async getTags(commandId: number): Promise<string[]> {
     const query = 'SELECT tag FROM tags WHERE command_id = $1';
     const result = await pool.query(query, [commandId]);
-    return result.rows.map(row => row.tag);
+    return result.rows.map((row: any) => row.tag);
   }
 
   static async addTags(commandId: number, tags: string[]): Promise<void> {

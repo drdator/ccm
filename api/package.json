@@ -29,6 +29,8 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "pg": "^8.16.3",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
     "yaml": "^2.8.0"
   },
   "devDependencies": {
@@ -38,6 +40,8 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.0.13",
+    "@types/pg": "^8.15.4",
+    "@types/sqlite3": "^3.1.11",
     "@types/yaml": "^1.9.6",
     "nodemon": "^3.1.10",
     "tsx": "^4.20.3",

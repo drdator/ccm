@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { UserModel } from '../models/User.js';
+// Use SQLite models for local development
+const UserModel = process.env.NODE_ENV === 'production'
+  ? (await import('../models/User.js')).UserModel
+  : (await import('../models/User-sqlite.js')).UserModel;
 import { ApiError } from './errorHandler.js';
 
 export interface AuthRequest extends Request {
@@ -24,7 +27,8 @@ export const authenticateToken = async (
       throw new ApiError(401, 'Access token required');
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+    const jwtSecret = process.env.JWT_SECRET || 'fallback-secret-key';
+    const decoded = jwt.verify(token, jwtSecret) as any;
     req.user = {
       id: decoded.id,
       username: decoded.username,

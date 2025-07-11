@@ -1,0 +1,12 @@
+{
+  "name": "test-project",
+  "description": "A test project",
+  "version": "1.0.0",
+  "dependencies": {},
+  "devDependencies": {},
+  "ccm": {
+    "registry": "https://registry.ccm.dev",
+    "installed": "./installed",
+    "commands": "./commands"
+  }
+}
