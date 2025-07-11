@@ -2,39 +2,26 @@ import chalk from 'chalk';
 import { writeFileSync, existsSync, mkdirSync, readFileSync } from 'fs';
 import { join, basename } from 'path';
 import { ApiClient } from '../utils/api-client.js';
-import { CcmConfigManager } from '../utils/ccm-config.js';
+import { ConsumerConfigManager } from '../utils/consumer-config.js';
 import { SymlinkManager } from '../utils/symlinks.js';
 
 interface InstallOptions {
   version?: string;
-  saveDev?: boolean;
   force?: boolean;
 }
 
 export async function install(commandName?: string, options: InstallOptions = {}) {
   const apiClient = new ApiClient();
-  const configManager = new CcmConfigManager();
+  const configManager = new ConsumerConfigManager();
 
   console.log(chalk.blue('📦 Installing command(s)...\n'));
 
-  // Check if we're in a CCM project
-  if (!configManager.exists()) {
-    console.log(chalk.red('❌ Not in a CCM project'));
-    console.log(chalk.gray('Run "ccm init" first to initialize the project'));
-    process.exit(1);
-  }
+  // Ensure .claude directory structure exists
+  configManager.ensureDirectories();
 
   const projectConfig = configManager.read();
   const installedDir = configManager.getInstalledDir();
   const commandsDir = configManager.getCommandsDir();
-
-  // Ensure directories exist
-  if (!existsSync(installedDir)) {
-    mkdirSync(installedDir, { recursive: true });
-  }
-  if (!existsSync(commandsDir)) {
-    mkdirSync(commandsDir, { recursive: true });
-  }
 
   try {
     if (commandName) {
@@ -55,7 +42,7 @@ async function installCommand(
   commandName: string,
   options: InstallOptions,
   apiClient: ApiClient,
-  configManager: CcmConfigManager
+  configManager: ConsumerConfigManager
 ) {
   console.log(chalk.gray(`Installing ${chalk.cyan(commandName)}...`));
 
@@ -79,13 +66,12 @@ async function installCommand(
 
   console.log(chalk.gray(`Found ${chalk.cyan(name)} v${version}`));
 
-  // Check if already installed
-  const existingFiles = files.filter((file: any) => 
-    existsSync(join(commandsDir, file.filename))
-  );
+  const packageCommandPath = join(commandsDir, name);
+  const packageInstalledDir = join(installedDir, name);
 
-  if (existingFiles.length > 0 && !options.force) {
-    console.log(chalk.yellow(`⚠️  Command "${name}" is already installed`));
+  // Check if package is already installed
+  if ((existsSync(packageCommandPath) || existsSync(packageInstalledDir)) && !options.force) {
+    console.log(chalk.yellow(`⚠️  Package "${name}" is already installed`));
     console.log(chalk.gray('Use --force to reinstall'));
     return;
   }
@@ -93,36 +79,41 @@ async function installCommand(
   // Install files
   console.log(chalk.gray(`Installing ${files.length} file(s)...`));
 
-  for (const file of files) {
-    const installedPath = join(installedDir, file.filename);
-    const commandPath = join(commandsDir, file.filename);
+  // Create package directory under installed/
+  if (!existsSync(packageInstalledDir)) {
+    mkdirSync(packageInstalledDir, { recursive: true });
+  }
 
-    // Write file to installed directory
-    const fileDir = join(installedDir, file.filename.split('/').slice(0, -1).join('/'));
-    if (fileDir !== installedDir && !existsSync(fileDir)) {
+  // Write all files to the package directory
+  for (const file of files) {
+    const installedPath = join(packageInstalledDir, file.filename);
+    
+    // Create subdirectories if needed
+    const fileDir = join(packageInstalledDir, file.filename.split('/').slice(0, -1).join('/'));
+    if (fileDir !== packageInstalledDir && !existsSync(fileDir)) {
       mkdirSync(fileDir, { recursive: true });
     }
     
     writeFileSync(installedPath, file.content);
     console.log(chalk.gray(`  ✓ ${file.filename}`));
+  }
 
-    // Create symlink in commands directory
-    const symlinkResult = SymlinkManager.createSymlink(installedPath, commandPath);
-    if (!symlinkResult.success) {
-      console.log(chalk.yellow(`⚠️  Warning: ${symlinkResult.error}`));
-      console.log(chalk.gray('File was copied instead of symlinked'));
-    }
+  // Create a single symlink for the entire package directory
+  const symlinkResult = SymlinkManager.createSymlink(packageInstalledDir, packageCommandPath);
+  
+  if (!symlinkResult.success) {
+    console.log(chalk.yellow(`⚠️  Warning: ${symlinkResult.error}`));
+    console.log(chalk.gray('Package directory was copied instead of symlinked'));
   }
 
   // Update ccm.json
   const projectConfig = configManager.read();
-  const depType = options.saveDev ? 'devDependencies' : 'dependencies';
   const versionSpec = options.version || `^${version}`;
 
-  if (!projectConfig[depType]) {
-    projectConfig[depType] = {};
+  if (!projectConfig.dependencies) {
+    projectConfig.dependencies = {};
   }
-  projectConfig[depType][name] = versionSpec;
+  projectConfig.dependencies[name] = versionSpec;
   configManager.write(projectConfig);
 
   // Update metadata
@@ -142,7 +133,8 @@ async function installCommand(
     description,
     tags,
     installedAt: new Date().toISOString(),
-    files: files.map((f: any) => f.filename)
+    files: files.map((f: any) => f.filename),
+    installedPath: join(installedDir, name)
   };
 
   writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
@@ -157,20 +149,20 @@ async function installCommand(
     console.log(chalk.gray(`   ${tags.map((t: string) => `#${t}`).join(' ')}`));
   }
 
-  console.log(chalk.blue('\n🎯 Command is now available in Claude Code!'));
-  console.log(chalk.gray(`Use: /${basename(files[0].filename, '.md')}`));
+  console.log(chalk.blue('\n🎯 Commands are now available in Claude Code!'));
+  console.log(chalk.gray('Use commands with namespace:'));
+  files.forEach((file: any) => {
+    const commandName = basename(file.filename, '.md');
+    console.log(chalk.gray(`  /${name}/${commandName}`));
+  });
 }
 
 async function installDependencies(
   projectConfig: any,
   apiClient: ApiClient,
-  configManager: CcmConfigManager
+  configManager: ConsumerConfigManager
 ) {
-  const dependencies = {
-    ...projectConfig.dependencies,
-    ...projectConfig.devDependencies
-  };
-
+  const dependencies = projectConfig.dependencies || {};
   const commandNames = Object.keys(dependencies);
 
   if (commandNames.length === 0) {

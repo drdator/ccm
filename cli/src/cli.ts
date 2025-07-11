@@ -127,13 +127,11 @@ program
   .command('install [command]')
   .description('Install command(s) from the registry')
   .option('-v, --version <version>', 'Specific version to install')
-  .option('-D, --save-dev', 'Save as dev dependency')
   .option('-f, --force', 'Force reinstall even if already installed')
   .action(async (command, options) => {
     try {
       await install(command, {
         version: options.version,
-        saveDev: options.saveDev,
         force: options.force
       });
     } catch (error) {

@@ -1,8 +1,0 @@
-# CCM installed commands
-installed/
-.ccm-lock.json
-*.ccm-tmp
-
-# Keep user commands
-!commands/
-!ccm.json

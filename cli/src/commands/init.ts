@@ -1,8 +1,8 @@
-import { mkdirSync, writeFileSync, existsSync } from 'fs';
+import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { basename } from 'path';
 import chalk from 'chalk';
-import { CcmConfigManager } from '../utils/ccm-config.js';
+import { CcmConfig } from '../types/ccm.js';
 
 interface InitOptions {
   name?: string;
@@ -11,85 +11,74 @@ interface InitOptions {
 }
 
 export async function init(options: InitOptions = {}) {
-  const projectRoot = process.cwd();
-  const projectName = options.name || basename(projectRoot);
-  const configManager = new CcmConfigManager(projectRoot);
+  console.log(chalk.blue('🚀 Initializing CCM project for command development...\n'));
 
-  console.log(chalk.blue('🚀 Initializing CCM project...\n'));
+  const cwd = process.cwd();
+  const commandsDir = join(cwd, 'commands');
+  const ccmConfigPath = join(cwd, 'ccm.json');
+  const gitignorePath = join(cwd, '.gitignore');
 
   // Check if already initialized
-  if (configManager.exists()) {
+  if (existsSync(ccmConfigPath)) {
     console.log(chalk.yellow('⚠️  CCM project already initialized'));
     console.log(chalk.gray('ccm.json already exists. Use --force to overwrite.'));
     return;
   }
 
   try {
-    // Create .claude directory if it doesn't exist
-    const claudeDir = configManager.getClaudeDir();
-    if (!existsSync(claudeDir)) {
-      mkdirSync(claudeDir, { recursive: true });
-      console.log(chalk.green('✅ Created .claude directory'));
-    }
-
-    // Create commands directory
-    const commandsDir = configManager.getCommandsDir();
+    // Create commands directory for development
+    console.log(chalk.gray('Creating directories...'));
     if (!existsSync(commandsDir)) {
       mkdirSync(commandsDir, { recursive: true });
-      console.log(chalk.green('✅ Created commands directory'));
+      console.log(chalk.gray('  ✓ commands/'));
     }
 
-    // Create installed directory
-    const installedDir = configManager.getInstalledDir();
-    if (!existsSync(installedDir)) {
-      mkdirSync(installedDir, { recursive: true });
-      console.log(chalk.green('✅ Created installed directory'));
+    // Create ccm.json in root
+    console.log(chalk.gray('\nCreating configuration...'));
+    
+    const projectName = options.name || basename(cwd);
+    const description = options.description || 'Claude commands package';
+    
+    const config: CcmConfig = {
+      name: projectName,
+      version: '1.0.0',
+      description
+    };
+
+    writeFileSync(ccmConfigPath, JSON.stringify(config, null, 2));
+    console.log(chalk.gray('  ✓ ccm.json'));
+
+    // Create/update .gitignore
+    let gitignoreContent = '';
+    if (existsSync(gitignorePath)) {
+      gitignoreContent = readFileSync(gitignorePath, 'utf-8');
     }
-
-    // Create ccm.json
-    const config = configManager.create(projectName, options.description);
-    console.log(chalk.green('✅ Created ccm.json'));
-
-    // Create .gitignore for Claude directory
-    const gitignorePath = join(claudeDir, '.gitignore');
-    const gitignoreContent = `# CCM installed commands
-installed/
-.ccm-lock.json
-*.ccm-tmp
-
-# Keep user commands
-!commands/
-!ccm.json
+    
+    const ccmIgnoreRules = `
+# CCM
+node_modules/
+*.log
+.DS_Store
 `;
     
-    writeFileSync(gitignorePath, gitignoreContent);
-    console.log(chalk.green('✅ Created .claude/.gitignore'));
-
-    // Create metadata file in installed directory
-    const metadataPath = join(installedDir, '.ccm-metadata.json');
-    const metadata = {
-      version: '1.0.0',
-      created: new Date().toISOString(),
-      installedPackages: {}
-    };
-    
-    writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
-    console.log(chalk.green('✅ Created installation metadata'));
-
-    // Display summary
-    console.log(chalk.blue('\n📋 Project initialized successfully!'));
-    console.log(chalk.gray('─'.repeat(50)));
-    console.log(chalk.white(`Project: ${chalk.cyan(config.name)}`));
-    if (config.description) {
-      console.log(chalk.white(`Description: ${chalk.gray(config.description)}`));
+    if (!gitignoreContent.includes('# CCM')) {
+      writeFileSync(gitignorePath, gitignoreContent + ccmIgnoreRules);
+      console.log(chalk.gray('  ✓ .gitignore updated'));
     }
-    console.log(chalk.white(`Commands: ${chalk.gray('.claude/commands/')}`));
-    console.log(chalk.white(`Installed: ${chalk.gray('.claude/installed/')}`));
+
+    // Success message
+    console.log(chalk.green('\n✅ CCM project initialized successfully!'));
+    console.log(chalk.gray('─'.repeat(45)));
+    console.log(chalk.white(`Project: ${chalk.cyan(projectName)}`));
+    console.log(chalk.white(`Location: ${chalk.gray(cwd)}`));
     
     console.log(chalk.blue('\n🎯 Next steps:'));
-    console.log(chalk.gray('• Create commands in .claude/commands/'));
-    console.log(chalk.gray('• Install packages with: ccm install <package>'));
-    console.log(chalk.gray('• List commands with: ccm list'));
+    console.log(chalk.gray('1. Create command files in commands/'));
+    console.log(chalk.gray('2. Test your commands locally'));
+    console.log(chalk.gray('3. Publish your commands: ccm publish'));
+    
+    console.log(chalk.yellow('\n📝 Example command file:'));
+    console.log(chalk.gray('  commands/hello.md'));
 
   } catch (error) {
     console.error(chalk.red('❌ Failed to initialize CCM project:'));

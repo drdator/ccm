@@ -1,6 +1,39 @@
 # CCM - Claude Command Manager
 
-CCM is a command manager for Claude AI, like NPM for JavaScript or pip for Python dependencies.
+CCM is a package manager for Claude AI commands, like NPM for JavaScript or pip for Python. It allows you to publish and share command sets (packages) that contain multiple Claude Code slash commands.
+
+## Key Concepts
+
+- **Command Sets**: Groups of related commands published together as a package
+- **Namespaced Access**: Commands are accessed with their package name (e.g., `/my-project/hello`)
+- **No Conflicts**: Multiple packages can have commands with the same name
+- **Version Management**: Entire command sets are versioned together
+- **Dual Structure**: Publishers work in root structure, consumers work in `.claude/` structure
+
+## Workflows
+
+### Publisher Workflow (Creating Commands)
+```bash
+# Create a new command set
+mkdir my-commands && cd my-commands
+ccm init --name "my-utils"
+
+# Create commands in commands/ directory
+echo "# Hello Command" > commands/hello.md
+
+# Publish to registry
+ccm publish
+```
+
+### Consumer Workflow (Using Commands)
+```bash
+# Use commands in any project
+cd my-project
+ccm install my-utils
+
+# Commands available in Claude Code
+# /my-utils/hello
+```
 
 ## Project Structure
 

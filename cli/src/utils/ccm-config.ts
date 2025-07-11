@@ -45,12 +45,10 @@ export class CcmConfigManager {
   }
 
   getCommandsDir(): string {
-    const config = this.exists() ? this.read() : { ccm: DEFAULT_CCM_CONFIG.ccm };
-    return join(this.claudeDir, config.ccm?.commands || 'commands');
+    return join(this.claudeDir, 'commands');
   }
 
   getInstalledDir(): string {
-    const config = this.exists() ? this.read() : { ccm: DEFAULT_CCM_CONFIG.ccm };
-    return join(this.claudeDir, config.ccm?.installed || 'installed');
+    return join(this.claudeDir, 'installed');
   }
 }

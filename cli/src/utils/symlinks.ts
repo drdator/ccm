@@ -1,4 +1,4 @@
-import { symlinkSync, unlinkSync, existsSync, lstatSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { symlinkSync, unlinkSync, existsSync, lstatSync, readFileSync, writeFileSync, mkdirSync, readdirSync } from 'fs';
 import { join, dirname, relative } from 'path';
 import { platform } from 'os';
 
@@ -61,17 +61,61 @@ export class SymlinkManager {
   }
 
   /**
-   * Copy file as fallback when symlinks fail
+   * Copy file or directory as fallback when symlinks fail
    */
   private static copyFile(source: string, target: string): SymlinkResult {
     try {
-      const content = readFileSync(source, 'utf-8');
-      writeFileSync(target, content);
+      const sourceStats = lstatSync(source);
+      
+      if (sourceStats.isDirectory()) {
+        // Copy directory recursively
+        return this.copyDirectory(source, target);
+      } else {
+        // Copy single file
+        const content = readFileSync(source, 'utf-8');
+        writeFileSync(target, content);
+        return { success: true };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: `Failed to copy: ${error instanceof Error ? error.message : String(error)}`
+      };
+    }
+  }
+
+  /**
+   * Copy directory recursively
+   */
+  private static copyDirectory(source: string, target: string): SymlinkResult {
+    try {
+      // Create target directory
+      if (!existsSync(target)) {
+        mkdirSync(target, { recursive: true });
+      }
+
+      // Read source directory
+      const files = readdirSync(source);
+      
+      // Copy each file/subdirectory
+      for (const file of files) {
+        const sourcePath = join(source, file);
+        const targetPath = join(target, file);
+        const stats = lstatSync(sourcePath);
+        
+        if (stats.isDirectory()) {
+          this.copyDirectory(sourcePath, targetPath);
+        } else {
+          const content = readFileSync(sourcePath, 'utf-8');
+          writeFileSync(targetPath, content);
+        }
+      }
+      
       return { success: true };
     } catch (error) {
       return {
         success: false,
-        error: `Failed to copy file: ${error instanceof Error ? error.message : String(error)}`
+        error: `Failed to copy directory: ${error instanceof Error ? error.message : String(error)}`
       };
     }
   }

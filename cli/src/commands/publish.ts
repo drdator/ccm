@@ -3,7 +3,7 @@ import { readFileSync, existsSync } from 'fs';
 import { glob } from 'glob';
 import { join, relative } from 'path';
 import { ApiClient } from '../utils/api-client.js';
-import { CcmConfigManager } from '../utils/ccm-config.js';
+import { CcmConfig } from '../types/ccm.js';
 
 interface PublishOptions {
   dry?: boolean;
@@ -12,9 +12,11 @@ interface PublishOptions {
 
 export async function publish(options: PublishOptions = {}) {
   const apiClient = new ApiClient();
-  const configManager = new CcmConfigManager();
+  const cwd = process.cwd();
+  const ccmConfigPath = join(cwd, 'ccm.json');
+  const commandsDir = join(cwd, 'commands');
 
-  console.log(chalk.blue('📦 Publishing command to CCM Registry...\n'));
+  console.log(chalk.blue('📦 Publishing command set to CCM Registry...\n'));
 
   // Check authentication
   if (!apiClient.isAuthenticated()) {
@@ -23,19 +25,24 @@ export async function publish(options: PublishOptions = {}) {
     process.exit(1);
   }
 
-  // Check if we're in a CCM project
-  if (!configManager.exists()) {
+  // Check if we're in a CCM project (publisher mode)
+  if (!existsSync(ccmConfigPath)) {
     console.log(chalk.red('❌ Not in a CCM project'));
     console.log(chalk.gray('Run "ccm init" first to initialize the project'));
     process.exit(1);
   }
 
+  if (!existsSync(commandsDir)) {
+    console.log(chalk.red('❌ Commands directory not found'));
+    console.log(chalk.gray('Create a commands/ directory with .md files'));
+    process.exit(1);
+  }
+
   try {
-    const projectConfig = configManager.read();
-    const commandsDir = configManager.getCommandsDir();
+    const projectConfig: CcmConfig = JSON.parse(readFileSync(ccmConfigPath, 'utf-8'));
 
     console.log(chalk.gray(`Project: ${chalk.cyan(projectConfig.name)}`));
-    console.log(chalk.gray(`Commands directory: ${chalk.cyan(relative(process.cwd(), commandsDir))}`));
+    console.log(chalk.gray(`Commands directory: ${chalk.cyan('commands/')}`));
 
     // Find all command files in the commands directory
     const pattern = join(commandsDir, '**/*.md');
@@ -43,7 +50,7 @@ export async function publish(options: PublishOptions = {}) {
 
     if (commandFiles.length === 0) {
       console.log(chalk.yellow('⚠️  No command files found'));
-      console.log(chalk.gray('Add .md files to the commands directory'));
+      console.log(chalk.gray('Add .md files to the commands/ directory'));
       process.exit(1);
     }
 
@@ -100,16 +107,17 @@ ${options.tag ? `tags: [${options.tag}]` : ''}`;
 
     const { command } = response.data;
 
-    console.log(chalk.green('✅ Command published successfully!'));
+    console.log(chalk.green('✅ Command set published successfully!'));
     console.log(chalk.gray('─'.repeat(45)));
-    console.log(chalk.white(`Name: ${chalk.cyan(command.name)}`));
+    console.log(chalk.white(`Package: ${chalk.cyan(command.name)}`));
     console.log(chalk.white(`Version: ${chalk.cyan(command.version)}`));
     console.log(chalk.white(`Description: ${chalk.gray(command.description)}`));
+    console.log(chalk.white(`Commands: ${chalk.cyan(commands.length)} file(s)`));
     if (command.tags && command.tags.length > 0) {
       console.log(chalk.white(`Tags: ${command.tags.map((t: string) => chalk.magenta(`#${t}`)).join(' ')}`));
     }
 
-    console.log(chalk.blue('\n🎯 Your command is now available:'));
+    console.log(chalk.blue('\n🎯 Your command set is now available:'));
     console.log(chalk.gray(`• Install: ccm install ${command.name}`));
     console.log(chalk.gray(`• View: ccm info ${command.name}`));
     console.log(chalk.gray(`• Search: ccm search ${command.name}`));

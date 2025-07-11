@@ -102,10 +102,12 @@ Create a dedicated command management system that brings the convenience and eco
 - **Output**: Capture and format command results
 
 #### 6.3 Package Management
-- **Install**: Download commands from remote repository
-- **Publish**: Share commands to community repository
+- **Install**: Download command sets (packages) from remote repository
+- **Publish**: Share command sets to community repository
+  - Commands are namespaced under package name (e.g., `my-project/hello`)
+  - All commands in a project are published together as a versioned set
 - **Update**: Sync with latest versions
-- **Dependencies**: Manage command dependencies
+- **Dependencies**: Manage command set dependencies
 
 #### 6.4 Organization
 - **Collections**: Group related commands

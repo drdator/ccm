@@ -8,6 +8,13 @@ This document provides a complete walkthrough of the Claude Command Manager (CCM
 - API server running (for full functionality)
 - Claude Code installed
 
+## Two Different Workflows
+
+CCM supports two different workflows:
+
+1. **Publishers**: Developers creating and publishing command sets
+2. **Consumers**: Users installing and using command sets from others
+
 ## Complete E2E Workflow
 
 ### 1. Initial Setup
@@ -33,24 +40,26 @@ npm link
 
 ### 2. Project Initialization
 
-#### Create a New Project
+#### A. Publisher Workflow (Creating Commands)
 ```bash
 # Create project directory
-mkdir my-claude-project
-cd my-claude-project
+mkdir my-command-set
+cd my-command-set
 
-# Initialize CCM project
-ccm init --name "my-project" --description "Custom commands for my project"
+# Initialize CCM project for development
+ccm init --name "my-project" --description "My awesome command set"
 ```
 
-**Result:** Creates `.claude/` directory structure:
+**Result:** Creates publisher structure:
 ```
-.claude/
-├── commands/           # User commands + symlinks to installed
-├── installed/          # CCM-managed commands (git-ignored)
-├── ccm.json           # Dependency manifest
+my-command-set/
+├── commands/           # Your command files (.md)
+├── ccm.json           # Package manifest
 └── .gitignore         # Auto-generated
 ```
+
+#### B. Consumer Workflow (Using Commands)
+No initialization needed! The `.claude/` directory is automatically created when you first install commands.
 
 ### 3. User Registration & Authentication
 
@@ -79,12 +88,12 @@ ccm whoami  # (if implemented)
 cat ~/.ccm/config.json
 ```
 
-### 4. Creating and Publishing Commands
+### 4. Creating and Publishing Command Sets
 
-#### Create a Command File
+#### Create Command Files (Publisher Workflow)
 ```bash
 # Create your first command
-cat > .claude/commands/git-commit-helper.md << 'EOF'
+cat > commands/git-commit-helper.md << 'EOF'
 ---
 description: Generate semantic git commit messages
 author: Your Name
@@ -100,20 +109,33 @@ Based on the following git diff, suggest a semantic commit message:
 
 $ARGUMENTS
 EOF
+
+# Create another command
+cat > commands/pr-reviewer.md << 'EOF'
+---
+description: Review pull requests for code quality
+author: Your Name
+tags: ["git", "code-review"]
+---
+
+# PR Reviewer
+
+Review this pull request for code quality, security, and best practices.
+EOF
 ```
 
-#### Publish Command to Registry
+#### Publish Command Set to Registry
 ```bash
 # Dry run first (see what would be published)
 ccm publish --dry
 
-# Actually publish
+# Actually publish all commands as a set
 ccm publish --tag "utility"
 ```
 
-**Result:** Command is uploaded to registry and available for others to install.
+**Result:** All commands in your project are published as a versioned set under your project name (e.g., `my-project`). Others can install the entire set with `ccm install my-project`.
 
-### 5. Discovering and Installing Commands
+### 5. Discovering and Installing Commands (Consumer Workflow)
 
 #### Search for Commands
 ```bash
@@ -124,26 +146,28 @@ ccm search "git"
 ccm search "helper" --limit 10 --offset 0
 ```
 
-#### Install Commands from Registry
+#### Install Command Sets from Registry
 ```bash
-# Install latest version
-ccm install git-helper
+# Navigate to where you want to use commands
+cd my-actual-project
+
+# Install latest version of a command set
+ccm install my-project
 
 # Install specific version
-ccm install git-helper --version 1.2.0
-
-# Install and save as dev dependency
-ccm install test-utils --save-dev
+ccm install my-project --version 1.2.0
 
 # Force reinstall
-ccm install git-helper --force
+ccm install my-project --force
 ```
 
 **Result:** 
-- Downloads command files to `.claude/installed/`
-- Creates symlinks in `.claude/commands/`
-- Updates `ccm.json` dependencies
-- Command becomes available in Claude Code
+- Creates `.claude/` directory if it doesn't exist
+- Downloads all command files to `.claude/installed/my-project/`
+- Creates a single symlink `.claude/commands/my-project/` -> `.claude/installed/my-project/`
+- Updates `.claude/ccm.json` dependencies
+- All commands from the set become available in Claude Code
+- Commands are accessed with namespace: `/my-project/command-name`
 
 #### Install All Dependencies
 ```bash
@@ -172,14 +196,17 @@ ccm info git-helper  # (if implemented)
 
 ### 7. Using Commands in Claude Code
 
-Once installed, commands are available in Claude Code:
+Once installed, commands are available in Claude Code with their namespace:
 
 ```
-# In Claude Code
-/git-commit-helper
+# In Claude Code - for the dev-tools package
+/dev-tools/git-commit-helper
 
 # With arguments
-/git-commit-helper Here's my git diff: [paste diff]
+/dev-tools/git-commit-helper Here's my git diff: [paste diff]
+
+# For your own commands
+/my-project/hello
 ```
 
 ### 8. Team Collaboration Workflow
@@ -200,7 +227,7 @@ ccm list
 #### Adding Team Dependencies
 ```bash
 # Team lead adds new command
-ccm install eslint-helper --save
+ccm install eslint-helper
 git add .claude/ccm.json
 git commit -m "Add eslint-helper command"
 git push
@@ -294,43 +321,57 @@ ccm init
 
 ## File Structure Overview
 
-After full setup, your project will look like:
-
+### Publisher Structure (Creating Commands)
 ```
-my-claude-project/
+my-command-set/
+├── commands/                          # Your command files
+│   ├── git-helper.md
+│   ├── pr-reviewer.md
+│   └── code-formatter.md
+├── ccm.json                           # Package manifest
+├── .gitignore                         # Auto-generated
+└── README.md
+```
+
+### Consumer Structure (Using Commands)
+```
+my-actual-project/
 ├── .claude/
 │   ├── commands/
-│   │   ├── my-command.md              # User-created
-│   │   ├── git-helper.md -> ../installed/git-helper.md  # Symlink
-│   │   └── eslint-helper.md -> ../installed/eslint-helper.md
+│   │   ├── dev-tools/ -> ../installed/dev-tools/  # Symlink to entire package
+│   │   └── code-quality/ -> ../installed/code-quality/  # Symlink to entire package
 │   ├── installed/                     # Git-ignored
-│   │   ├── git-helper.md
-│   │   ├── eslint-helper.md
+│   │   ├── dev-tools/                 # Installed package
+│   │   │   ├── git-helper.md
+│   │   │   └── pr-reviewer.md
+│   │   ├── code-quality/              # Another installed package
+│   │   │   ├── eslint-helper.md
+│   │   │   └── prettier-format.md
 │   │   └── .ccm-metadata.json
-│   ├── ccm.json                       # Dependency manifest
-│   └── .gitignore                     # Auto-generated
+│   └── ccm.json                       # Dependency manifest
 ├── src/                               # Your project files
 └── README.md
 ```
 
-## ccm.json Example
+## ccm.json Examples
 
+### Publisher ccm.json (root of command set)
 ```json
 {
-  "name": "my-project",
+  "name": "dev-tools",
+  "version": "1.2.0",
+  "description": "Development productivity commands"
+}
+```
+
+### Consumer ccm.json (.claude/ccm.json)
+```json
+{
+  "name": "consumer-project",
   "version": "1.0.0",
-  "description": "Custom commands for my project",
   "dependencies": {
-    "git-helper": "^1.2.0",
-    "eslint-helper": "^2.0.0"
-  },
-  "devDependencies": {
-    "test-utils": "^1.0.0"
-  },
-  "ccm": {
-    "registry": "http://localhost:3000/api",
-    "installed": "./installed",
-    "commands": "./commands"
+    "dev-tools": "^1.2.0",
+    "code-quality": "^2.0.0"
   }
 }
 ```
