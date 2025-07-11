@@ -73,3 +73,20 @@ To publish a command, send a POST request to `/api/commands` with:
   ]
 }
 ```
+
+## Testing
+
+The API includes a comprehensive test suite using Vitest:
+
+```bash
+# Install test dependencies
+npm install --save-dev vitest supertest @types/supertest
+
+# Run tests
+npm test
+
+# Run with coverage
+npm run test:coverage
+```
+
+Tests cover all endpoints with authentication, validation, and error cases. See `src/tests/README.md` for details.

@@ -8,7 +8,9 @@
     "dev": "nodemon --exec tsx src/index.ts",
     "start": "node dist/index.js",
     "migrate": "tsx src/database/migrate.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "keywords": [
     "claude",
@@ -42,9 +44,13 @@
     "@types/node": "^24.0.13",
     "@types/pg": "^8.15.4",
     "@types/sqlite3": "^3.1.11",
+    "@types/supertest": "^2.0.12",
     "@types/yaml": "^1.9.6",
+    "@vitest/ui": "^0.34.0",
     "nodemon": "^3.1.10",
+    "supertest": "^6.3.3",
     "tsx": "^4.20.3",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^0.34.0"
   }
 }

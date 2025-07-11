@@ -6,8 +6,12 @@ let db: any = null;
 
 export async function getDatabase() {
   if (!db) {
+    const dbFilename = process.env.NODE_ENV === 'test' 
+      ? 'test-ccm-registry.db' 
+      : 'ccm-registry.db';
+      
     db = await open({
-      filename: join(process.cwd(), 'ccm-registry.db'),
+      filename: join(process.cwd(), dbFilename),
       driver: sqlite3.Database
     });
     
