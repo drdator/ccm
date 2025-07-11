@@ -41,6 +41,7 @@ This is a monorepo containing:
 
 - **`cli/`** - Command-line interface for managing Claude commands
 - **`api/`** - Registry API server for hosting and sharing commands
+- **`web/`** - Web interface for browsing and discovering commands
 
 ## Quick Start
 
@@ -64,21 +65,37 @@ ccm list
 
 ### Development Setup
 
-#### CLI Development
+#### Full Stack Development
 ```bash
+# Install dependencies
 npm install
-npm run build:cli
+
+# Terminal 1: Start API server
+npm run dev:api
+
+# Terminal 2: Start web interface
+npm run dev:web
+
+# Terminal 3: Test CLI
+cd cli && npm run build && npm link
 ```
 
-#### API Development  
+#### Individual Components
 ```bash
-npm install
-npm run dev:api    # Starts with SQLite (no Docker needed)
+# CLI only
+npm run build:cli
+
+# API only
+npm run dev:api
+
+# Web only
+npm run dev:web
 ```
 
 ## Commands
 
 - `npm run dev:cli` - Run CLI in development mode
 - `npm run dev:api` - Run API server (auto-creates SQLite DB)
-- `npm run build` - Build both CLI and API
+- `npm run dev:web` - Run web interface (http://localhost:8080)
+- `npm run build` - Build all components
 - `npm run migrate` - Run database migrations (for SQLite)

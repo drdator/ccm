@@ -1,0 +1,23 @@
+{
+  "name": "ccm-web",
+  "version": "0.1.0",
+  "description": "CCM Registry Web Interface - Browse and discover Claude Code command packages",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 8080 || python3 -m http.server 8080",
+    "serve": "npx serve . -s -p 8080",
+    "build": "echo 'Static site - no build required'"
+  },
+  "keywords": [
+    "claude",
+    "commands",
+    "registry",
+    "web",
+    "frontend"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}

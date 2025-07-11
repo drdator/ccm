@@ -5,16 +5,19 @@
   "private": true,
   "workspaces": [
     "cli",
-    "api"
+    "api",
+    "web"
   ],
   "scripts": {
     "build": "npm run build --workspaces",
     "dev:cli": "npm run dev --workspace=cli",
     "dev:api": "npm run dev --workspace=api",
+    "dev:web": "npm run dev --workspace=web",
     "build:cli": "npm run build --workspace=cli",
     "build:api": "npm run build --workspace=api",
     "start:cli": "npm run start --workspace=cli",
     "start:api": "npm run start --workspace=api",
+    "start:web": "npm run serve --workspace=web",
     "migrate": "npm run migrate --workspace=api",
     "dev:setup": "./scripts/dev.sh",
     "dev:start": "docker-compose up -d",
