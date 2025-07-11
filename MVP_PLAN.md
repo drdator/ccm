@@ -66,7 +66,7 @@ $ARGUMENTS
 
 ## Implementation Steps
 
-### Phase 1: CLI Foundation (Week 1-2)
+### Phase 1: CLI Foundation
 
 #### Step 1.1: Project Setup
 - [ ] Initialize Node.js project with TypeScript
@@ -88,7 +88,7 @@ $ARGUMENTS
 
 **Deliverable**: `ccm list` command working locally
 
-### Phase 2: Registry API (Week 3-4)
+### Phase 2: Registry API
 
 #### Step 2.1: API Infrastructure
 - [ ] Set up Express.js API server
@@ -154,7 +154,7 @@ CREATE TABLE tags (
 
 **Deliverable**: Working API with authentication
 
-### Phase 3: Command Publishing (Week 5)
+### Phase 3: Command Publishing
 
 #### Step 3.1: CLI Publishing Flow
 - [ ] Implement `ccm init` to create command.yaml
@@ -175,7 +175,7 @@ CREATE TABLE tags (
 
 **Deliverable**: `ccm publish` command working end-to-end
 
-### Phase 4: Command Installation (Week 6)
+### Phase 4: Command Installation
 
 #### Step 4.1: Search Implementation
 - [ ] Add `ccm search <query>` command
@@ -196,7 +196,7 @@ CREATE TABLE tags (
 
 **Deliverable**: Full install/uninstall functionality
 
-### Phase 5: Polish & Launch (Week 7-8)
+### Phase 5: Polish & Launch
 
 #### Step 5.1: User Experience
 - [ ] Add progress indicators for downloads
@@ -269,13 +269,13 @@ CREATE TABLE tags (
 
 ## Post-MVP Roadmap
 
-### Version 0.2.0 (Month 2-3)
+### Version 0.2.0
 - Web interface for browsing commands
 - Command collections/bundles
 - User profiles and statistics
 - Command ratings and reviews
 
-### Version 0.3.0 (Month 4-6)
+### Version 0.3.0
 - VSCode extension
 - Team/organization accounts
 - Private command repositories
@@ -283,13 +283,13 @@ CREATE TABLE tags (
 
 ## Development Timeline
 
-| Week | Focus | Deliverable |
-|------|-------|-------------|
-| 1-2 | CLI Foundation | Local command management |
-| 3-4 | Registry API | Working API with auth |
-| 5 | Publishing | Command publishing flow |
-| 6 | Installation | Search and install |
-| 7-8 | Polish & Launch | Production MVP |
+| Phase | Focus | Deliverable |
+|-------|-------|-------------|
+| 1 | CLI Foundation | Local command management |
+| 2 | Registry API | Working API with auth |
+| 3 | Publishing | Command publishing flow |
+| 4 | Installation | Search and install |
+| 5 | Polish & Launch | Production MVP |
 
 ## Next Steps
 
