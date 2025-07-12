@@ -8,9 +8,9 @@
     "dev": "nodemon --exec tsx src/index.ts",
     "start": "node dist/index.js",
     "migrate": "tsx src/database/migrate.ts",
-    "test": "vitest",
+    "test": "vitest --run",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage --run"
   },
   "keywords": [
     "claude",
@@ -42,6 +42,7 @@
     "@types/sqlite3": "^3.1.11",
     "@types/supertest": "^2.0.12",
     "@types/yaml": "^1.9.6",
+    "@vitest/coverage-v8": "^0.34.6",
     "@vitest/ui": "^0.34.0",
     "nodemon": "^3.1.10",
     "supertest": "^6.3.3",
