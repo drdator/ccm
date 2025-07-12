@@ -9,7 +9,6 @@ export interface CliRunResult {
 }
 
 export interface CliRunOptions {
-  input?: string;           // Input to send to stdin (for interactive prompts)
   cwd?: string;            // Working directory
   env?: Record<string, string>; // Environment variables
   timeout?: number;        // Timeout in milliseconds (default: 10s)
@@ -26,10 +25,9 @@ export class CliRunner {
 
   async run(args: string[], options: CliRunOptions = {}): Promise<CliRunResult> {
     const {
-      input,
       cwd = process.cwd(),
       env = {},
-      timeout = 15000,
+      timeout = 10000,
       apiUrl
     } = options;
 
@@ -88,14 +86,8 @@ export class CliRunner {
         }
       });
 
-      // Send input if provided (for interactive prompts)
-      if (input && child.stdin) {
-        // Small delay to ensure CLI is ready for input
-        setTimeout(() => {
-          child.stdin?.write(input);
-          child.stdin?.end();
-        }, 100);
-      }
+      // Close stdin immediately since we're using command-line arguments
+      child.stdin?.end();
 
       // Set timeout
       setTimeout(() => {
@@ -115,17 +107,15 @@ export class CliRunner {
 
   // Helper methods for common commands
   async register(username: string, email: string, password: string, options: CliRunOptions = {}): Promise<CliRunResult> {
-    return this.run(['register'], {
-      ...options,
-      input: `${username}\n${email}\n${password}\n`
-    });
+    return this.run(['register', '-u', username, '-e', email, '-p', password], options);
   }
 
   async login(username: string, password: string, options: CliRunOptions = {}): Promise<CliRunResult> {
-    return this.run(['login'], {
-      ...options,
-      input: `${username}\n${password}\n`
-    });
+    return this.run(['login', '-u', username, '-p', password], options);
+  }
+
+  async loginForce(username: string, password: string, options: CliRunOptions = {}): Promise<CliRunResult> {
+    return this.run(['login', '-u', username, '-p', password, '-f'], options);
   }
 
   async logout(options: CliRunOptions = {}): Promise<CliRunResult> {
@@ -133,10 +123,7 @@ export class CliRunner {
   }
 
   async init(projectName: string, options: CliRunOptions = {}): Promise<CliRunResult> {
-    return this.run(['init'], {
-      ...options,
-      input: `${projectName}\nTest project\ny\n`
-    });
+    return this.run(['init', '-n', projectName, '-d', 'Test project', '-y'], options);
   }
 
   async publish(options: CliRunOptions = {}): Promise<CliRunResult> {

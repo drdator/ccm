@@ -72,13 +72,12 @@ export async function login(options: LoginOptions = {}) {
 
     // Save authentication details
     const { user, token } = response.data;
-    apiClient.saveAuth(token, user.username, user.api_key);
+    apiClient.saveAuth(token, user.username);
 
     console.log(chalk.green('✅ Login successful!'));
     console.log(chalk.gray('─'.repeat(40)));
     console.log(chalk.white(`User: ${chalk.cyan(user.username)}`));
     console.log(chalk.white(`Email: ${chalk.gray(user.email)}`));
-    console.log(chalk.white(`API Key: ${chalk.gray(`${user.api_key.substring(0, 8)}...`)}`));
     
     console.log(chalk.blue('\n🎯 You can now:'));
     console.log(chalk.gray('• Publish commands: ccm publish'));
