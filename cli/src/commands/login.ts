@@ -1,9 +1,11 @@
 import chalk from 'chalk';
+import inquirer from 'inquirer';
 import { ApiClient } from '../utils/api-client.js';
 
 interface LoginOptions {
   username?: string;
   password?: string;
+  force?: boolean;
 }
 
 export async function login(options: LoginOptions = {}) {
@@ -12,7 +14,7 @@ export async function login(options: LoginOptions = {}) {
   console.log(chalk.blue('🔐 Logging into CCM Registry...\n'));
 
   // Check if already authenticated
-  if (apiClient.isAuthenticated()) {
+  if (apiClient.isAuthenticated() && !options.force) {
     const currentUser = apiClient.getUsername();
     console.log(chalk.yellow(`⚠️  Already logged in as ${chalk.cyan(currentUser)}`));
     console.log(chalk.gray('Use --force to login as a different user'));
@@ -22,24 +24,38 @@ export async function login(options: LoginOptions = {}) {
   let username = options.username;
   let password = options.password;
 
-  // Get credentials if not provided
-  if (!username) {
-    // In a real implementation, you'd use a library like 'inquirer' for prompts
-    console.log(chalk.red('❌ Username is required'));
-    console.log(chalk.gray('Usage: ccm login --username <username> --password <password>'));
-    process.exit(1);
-  }
+  // Get credentials using secure prompts if not provided
+  if (!username || !password) {
+    const questions = [];
+    
+    if (!username) {
+      questions.push({
+        type: 'input',
+        name: 'username',
+        message: 'Username or email:',
+        validate: (input: string) => input.trim().length > 0 || 'Username is required'
+      });
+    }
+    
+    if (!password) {
+      questions.push({
+        type: 'password',
+        name: 'password',
+        message: 'Password:',
+        mask: '*',
+        validate: (input: string) => input.length > 0 || 'Password is required'
+      });
+    }
 
-  if (!password) {
-    console.log(chalk.red('❌ Password is required'));
-    console.log(chalk.gray('Usage: ccm login --username <username> --password <password>'));
-    process.exit(1);
+    const answers = await inquirer.prompt(questions as any);
+    username = username || answers.username;
+    password = password || answers.password;
   }
 
   try {
-    console.log(chalk.gray(`Authenticating as ${username}...`));
+    console.log(chalk.gray(`Authenticating as ${username!}...`));
 
-    const response = await apiClient.login(username, password);
+    const response = await apiClient.login(username!, password!);
 
     if (!response.success) {
       console.log(chalk.red('❌ Login failed:'), response.error);

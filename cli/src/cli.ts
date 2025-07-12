@@ -9,6 +9,7 @@ import { register } from './commands/register.js';
 import { publish } from './commands/publish.js';
 import { search } from './commands/search.js';
 import { install } from './commands/install.js';
+import { config } from './commands/config.js';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -148,6 +149,23 @@ program
   .action(async (options) => {
     try {
       await publish(options);
+    } catch (error) {
+      console.error(chalk.red('Error:'), error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
+  });
+
+// Configuration command
+program
+  .command('config')
+  .description('Manage CCM configuration')
+  .option('-l, --list', 'List all configuration')
+  .option('-g, --get <key>', 'Get configuration value')
+  .option('-s, --set <key=value>', 'Set configuration value')
+  .option('-r, --registry <url>', 'Set registry URL')
+  .action(async (options) => {
+    try {
+      await config(options);
     } catch (error) {
       console.error(chalk.red('Error:'), error instanceof Error ? error.message : String(error));
       process.exit(1);

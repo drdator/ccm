@@ -26,8 +26,18 @@ export class ApiConfigManager {
   }
 
   private loadConfig(): ApiConfig {
+    // Default to production URL, but allow development override
+    const getDefaultRegistryUrl = () => {
+      // Check if we're in development environment
+      if (process.env.NODE_ENV === 'development' || process.env.CCM_DEV === 'true') {
+        return 'http://localhost:3000/api';
+      }
+      // Production default - this should be updated when you have a production URL
+      return process.env.CCM_REGISTRY_URL || 'http://localhost:3000/api';
+    };
+
     const defaultConfig: ApiConfig = {
-      registryUrl: process.env.CCM_REGISTRY_URL || 'http://localhost:3000/api'
+      registryUrl: getDefaultRegistryUrl()
     };
 
     if (!existsSync(this.configPath)) {

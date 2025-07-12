@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import inquirer from 'inquirer';
 import { ApiClient } from '../utils/api-client.js';
 
 interface RegisterOptions {
@@ -22,46 +23,83 @@ export async function register(options: RegisterOptions = {}) {
 
   let { username, email, password } = options;
 
-  // Validate required fields
+  // Get registration details using secure prompts if not provided
+  const questions = [];
+  
   if (!username) {
-    console.log(chalk.red('❌ Username is required'));
-    console.log(chalk.gray('Usage: ccm register --username <username> --email <email> --password <password>'));
-    process.exit(1);
+    questions.push({
+      type: 'input',
+      name: 'username',
+      message: 'Username (3+ characters):',
+      validate: (input: string) => {
+        const trimmed = input.trim();
+        if (trimmed.length < 3) return 'Username must be at least 3 characters';
+        if (!/^[a-zA-Z0-9_-]+$/.test(trimmed)) return 'Username can only contain letters, numbers, underscores, and hyphens';
+        return true;
+      }
+    });
   }
-
+  
   if (!email) {
-    console.log(chalk.red('❌ Email is required'));
-    console.log(chalk.gray('Usage: ccm register --username <username> --email <email> --password <password>'));
-    process.exit(1);
+    questions.push({
+      type: 'input',
+      name: 'email',
+      message: 'Email address:',
+      validate: (input: string) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(input.trim())) return 'Please enter a valid email address';
+        return true;
+      }
+    });
   }
-
+  
   if (!password) {
-    console.log(chalk.red('❌ Password is required'));
-    console.log(chalk.gray('Usage: ccm register --username <username> --email <email> --password <password>'));
-    process.exit(1);
+    questions.push({
+      type: 'password',
+      name: 'password',
+      message: 'Password (8+ characters with uppercase, lowercase, number, special char):',
+      mask: '*',
+      validate: (input: string) => {
+        if (input.length < 8) return 'Password must be at least 8 characters';
+        if (!/(?=.*[a-z])/.test(input)) return 'Password must contain at least one lowercase letter';
+        if (!/(?=.*[A-Z])/.test(input)) return 'Password must contain at least one uppercase letter';
+        if (!/(?=.*\d)/.test(input)) return 'Password must contain at least one number';
+        if (!/(?=.*[@$!%*?&])/.test(input)) return 'Password must contain at least one special character (@$!%*?&)';
+        return true;
+      }
+    });
   }
 
-  // Basic validation
-  if (username.length < 3) {
+  if (questions.length > 0) {
+    const answers = await inquirer.prompt(questions as any);
+    username = username || answers.username;
+    email = email || answers.email;
+    password = password || answers.password;
+  }
+
+  // Final validation for command-line provided values
+  if (username && username.length < 3) {
     console.log(chalk.red('❌ Username must be at least 3 characters'));
     process.exit(1);
   }
 
-  if (password.length < 8) {
-    console.log(chalk.red('❌ Password must be at least 8 characters'));
-    process.exit(1);
+  if (email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      console.log(chalk.red('❌ Invalid email format'));
+      process.exit(1);
+    }
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    console.log(chalk.red('❌ Invalid email format'));
+  if (password && password.length < 8) {
+    console.log(chalk.red('❌ Password must be at least 8 characters and meet complexity requirements'));
     process.exit(1);
   }
 
   try {
-    console.log(chalk.gray(`Creating account for ${username}...`));
+    console.log(chalk.gray(`Creating account for ${username!}...`));
 
-    const response = await apiClient.register(username, email, password);
+    const response = await apiClient.register(username!, email!, password!);
 
     if (!response.success) {
       console.log(chalk.red('❌ Registration failed:'), response.error);
