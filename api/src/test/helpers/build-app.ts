@@ -18,6 +18,12 @@ export async function buildApp(opts = {}): Promise<FastifyInstance> {
     credentials: true
   });
 
+  // Register rate limiting with generous limits for testing
+  await app.register(import('@fastify/rate-limit'), {
+    max: 1000, // Very high for testing
+    timeWindow: '1 minute'
+  });
+
   // Register routes
   app.get('/health', async (request, reply) => {
     return { 
@@ -35,15 +41,15 @@ export async function buildApp(opts = {}): Promise<FastifyInstance> {
   return app;
 }
 
-// Test user data
+// Test user data with complex passwords
 export const testUser = {
   username: 'testuser',
   email: 'test@example.com',
-  password: 'password123'
+  password: 'Password123!'
 };
 
 export const testUser2 = {
   username: 'testuser2',
   email: 'test2@example.com',
-  password: 'password456'
+  password: 'Password456!'
 };

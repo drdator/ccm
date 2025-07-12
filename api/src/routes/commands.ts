@@ -282,7 +282,13 @@ async function verifyToken(token: string): Promise<any> {
   return new Promise((resolve, reject) => {
     jwt.verify(token, process.env.JWT_SECRET!, (err, decoded) => {
       if (err) {
-        reject(err);
+        if (err.name === 'TokenExpiredError') {
+          reject(new Error('Token has expired. Please login again.'));
+        } else if (err.name === 'JsonWebTokenError') {
+          reject(new Error('Invalid token format.'));
+        } else {
+          reject(new Error('Token verification failed.'));
+        }
       } else {
         resolve(decoded);
       }

@@ -18,6 +18,7 @@ export async function getDatabase() {
     // Enable foreign key constraints
     await db.exec('PRAGMA foreign_keys = ON');
     
+    // Use console.log for database connection as logger isn't available yet
     console.log('✅ Connected to SQLite database');
   }
   
@@ -88,6 +89,7 @@ export async function initializeDatabase() {
     CREATE INDEX IF NOT EXISTS idx_users_api_key ON users(api_key);
   `);
   
+  // Use console.log for database initialization as logger isn't available yet
   console.log('✅ Database tables created/verified');
 }
 

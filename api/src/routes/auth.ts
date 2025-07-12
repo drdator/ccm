@@ -5,6 +5,43 @@ const UserModel = process.env.NODE_ENV === 'production'
   ? (await import('../models/User.js')).UserModel
   : (await import('../models/User-sqlite.js')).UserModel;
 
+// Password validation function
+function validatePassword(password: string): string | null {
+  if (password.length < 8) {
+    return 'Password must be at least 8 characters long';
+  }
+  if (password.length > 128) {
+    return 'Password must be less than 128 characters';
+  }
+  if (!/(?=.*[a-z])/.test(password)) {
+    return 'Password must contain at least one lowercase letter';
+  }
+  if (!/(?=.*[A-Z])/.test(password)) {
+    return 'Password must contain at least one uppercase letter';
+  }
+  if (!/(?=.*\d)/.test(password)) {
+    return 'Password must contain at least one number';
+  }
+  if (!/(?=.*[@$!%*?&])/.test(password)) {
+    return 'Password must contain at least one special character (@$!%*?&)';
+  }
+  return null;
+}
+
+// Rate limiting preHandler for auth endpoints
+const authRateLimit = {
+  max: process.env.NODE_ENV === 'production' ? 5 : 50, // Very restrictive for auth
+  timeWindow: '15 minutes',
+  errorResponseBuilder: (request: any, context: any) => {
+    return {
+      code: 429,
+      error: 'Too Many Requests',
+      message: `Too many authentication attempts, retry in ${Math.round(context.ttl / 1000)} seconds`,
+      expiresIn: Math.round(context.ttl / 1000)
+    };
+  }
+};
+
 // Enhanced Fastify schemas with validation
 const registerSchema = {
   body: {
@@ -24,8 +61,9 @@ const registerSchema = {
       },
       password: { 
         type: 'string', 
-        minLength: 6,
-        maxLength: 128 
+        minLength: 8,
+        maxLength: 128,
+        pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]'
       }
     },
     additionalProperties: false
@@ -132,7 +170,13 @@ async function verifyToken(token: string): Promise<any> {
   return new Promise((resolve, reject) => {
     jwt.verify(token, process.env.JWT_SECRET!, (err, decoded) => {
       if (err) {
-        reject(err);
+        if (err.name === 'TokenExpiredError') {
+          reject(new Error('Token has expired. Please login again.'));
+        } else if (err.name === 'JsonWebTokenError') {
+          reject(new Error('Invalid token format.'));
+        } else {
+          reject(new Error('Token verification failed.'));
+        }
       } else {
         resolve(decoded);
       }
@@ -162,6 +206,9 @@ const authenticateHook = async (request: FastifyRequest, reply: FastifyReply) =>
 };
 
 export default async function authRoutes(fastify: FastifyInstance) {
+  // Register rate limiting for auth routes
+  await fastify.register(import('@fastify/rate-limit'), authRateLimit);
+
   // Register user
   fastify.post('/register', {
     schema: registerSchema
@@ -170,6 +217,14 @@ export default async function authRoutes(fastify: FastifyInstance) {
   }>, reply) => {
     try {
       const { username, email, password } = request.body;
+
+      // Validate password complexity
+      const passwordError = validatePassword(password);
+      if (passwordError) {
+        return reply.status(400).send({
+          error: passwordError
+        });
+      }
 
       // Check if user already exists
       const existingUserByUsername = await UserModel.findByUsername(username);

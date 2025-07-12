@@ -42,7 +42,7 @@ describe('Authentication API', () => {
         payload: {
           username: testUser.username,
           email: 'different@example.com',
-          password: 'password123'
+          password: 'Password123!'
         }
       });
 
@@ -66,7 +66,7 @@ describe('Authentication API', () => {
         payload: {
           username: 'differentuser',
           email: testUser.email,
-          password: 'password123'
+          password: 'Password123!'
         }
       });
 
