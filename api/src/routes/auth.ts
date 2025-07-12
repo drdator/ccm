@@ -1,135 +1,303 @@
-import { Router } from 'express';
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import jwt from 'jsonwebtoken';
 // Use SQLite models for local development
 const UserModel = process.env.NODE_ENV === 'production' 
   ? (await import('../models/User.js')).UserModel
   : (await import('../models/User-sqlite.js')).UserModel;
-import { ApiError } from '../middleware/errorHandler.js';
-import { authenticateToken, AuthRequest } from '../middleware/auth.js';
 
-const router = Router();
-
-// Register new user
-router.post('/register', async (req, res, next) => {
-  try {
-    const { username, email, password } = req.body;
-
-    // Validation
-    if (!username || !email || !password) {
-      throw new ApiError(400, 'Username, email, and password are required');
-    }
-
-    if (username.length < 3 || username.length > 50) {
-      throw new ApiError(400, 'Username must be between 3 and 50 characters');
-    }
-
-    if (password.length < 8) {
-      throw new ApiError(400, 'Password must be at least 8 characters');
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      throw new ApiError(400, 'Invalid email format');
-    }
-
-    // Check if user exists
-    const existingUser = await UserModel.findByUsername(username) || await UserModel.findByEmail(email);
-    if (existingUser) {
-      throw new ApiError(409, 'Username or email already exists');
-    }
-
-    // Create user
-    const user = await UserModel.create(username, email, password);
-
-    // Generate JWT
-    const jwtSecret = process.env.JWT_SECRET || 'fallback-secret-key';
-    const token = jwt.sign(
-      { id: user.id, username: user.username, email: user.email },
-      jwtSecret,
-      { expiresIn: process.env.JWT_EXPIRY || '7d' }
-    );
-
-    res.status(201).json({
-      message: 'User created successfully',
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        api_key: user.api_key
+// Enhanced Fastify schemas with validation
+const registerSchema = {
+  body: {
+    type: 'object',
+    required: ['username', 'email', 'password'],
+    properties: {
+      username: { 
+        type: 'string', 
+        minLength: 3, 
+        maxLength: 50,
+        pattern: '^[a-zA-Z0-9_-]+$' 
       },
-      token
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Login
-router.post('/login', async (req, res, next) => {
-  try {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-      throw new ApiError(400, 'Username and password are required');
-    }
-
-    // Find user by username or email
-    const user = await UserModel.findByUsername(username) || await UserModel.findByEmail(username);
-    if (!user) {
-      throw new ApiError(401, 'Invalid credentials');
-    }
-
-    // Verify password
-    const isValid = await UserModel.verifyPassword(user, password);
-    if (!isValid) {
-      throw new ApiError(401, 'Invalid credentials');
-    }
-
-    // Generate JWT
-    const jwtSecret = process.env.JWT_SECRET || 'fallback-secret-key';
-    const token = jwt.sign(
-      { id: user.id, username: user.username, email: user.email },
-      jwtSecret,
-      { expiresIn: process.env.JWT_EXPIRY || '7d' }
-    );
-
-    res.json({
-      message: 'Login successful',
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        api_key: user.api_key
+      email: { 
+        type: 'string', 
+        format: 'email',
+        maxLength: 255 
       },
-      token
-    });
-  } catch (error) {
-    next(error);
+      password: { 
+        type: 'string', 
+        minLength: 6,
+        maxLength: 128 
+      }
+    },
+    additionalProperties: false
+  },
+  response: {
+    201: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' },
+        token: { type: 'string' },
+        user: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            username: { type: 'string' },
+            email: { type: 'string' }
+          }
+        }
+      }
+    },
+    409: {
+      type: 'object',
+      properties: {
+        error: { type: 'string' }
+      }
+    }
   }
-});
+};
 
-// Get current user info
-router.get('/me', authenticateToken, async (req: AuthRequest, res, next) => {
+const loginSchema = {
+  body: {
+    type: 'object',
+    required: ['username', 'password'],
+    properties: {
+      username: { type: 'string', minLength: 1 },
+      password: { type: 'string', minLength: 1 }
+    },
+    additionalProperties: false
+  },
+  response: {
+    200: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' },
+        token: { type: 'string' },
+        user: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            username: { type: 'string' },
+            email: { type: 'string' }
+          }
+        }
+      }
+    },
+    401: {
+      type: 'object',
+      properties: {
+        error: { type: 'string' }
+      }
+    }
+  }
+};
+
+const regenerateApiKeySchema = {
+  headers: {
+    type: 'object',
+    required: ['authorization'],
+    properties: {
+      authorization: { type: 'string' }
+    }
+  },
+  response: {
+    200: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' },
+        apiKey: { type: 'string' }
+      }
+    },
+    401: {
+      type: 'object',
+      properties: {
+        error: { type: 'string' }
+      }
+    }
+  }
+};
+
+// Helper function to extract JWT token
+function extractToken(request: FastifyRequest): string | null {
+  const authHeader = request.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null;
+  }
+  return authHeader.substring(7);
+}
+
+// Helper function to verify JWT token
+async function verifyToken(token: string): Promise<any> {
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET environment variable is required');
+  }
+  
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, process.env.JWT_SECRET!, (err, decoded) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(decoded);
+      }
+    });
+  });
+}
+
+// Authentication hook for protected routes
+const authenticateHook = async (request: FastifyRequest, reply: FastifyReply) => {
   try {
-    res.json({
-      user: req.user
-    });
-  } catch (error) {
-    next(error);
-  }
-});
+    const token = extractToken(request);
+    if (!token) {
+      return reply.status(401).send({
+        error: 'Access token required'
+      });
+    }
 
-// Regenerate API key
-router.post('/regenerate-api-key', authenticateToken, async (req: AuthRequest, res, next) => {
-  try {
-    const newApiKey = await UserModel.regenerateApiKey(req.user!.id);
-    res.json({
-      message: 'API key regenerated successfully',
-      api_key: newApiKey
-    });
+    const decoded = await verifyToken(token);
+    
+    // Attach user info to request
+    (request as any).user = decoded;
   } catch (error) {
-    next(error);
+    return reply.status(401).send({
+      error: 'Invalid or expired token'
+    });
   }
-});
+};
 
-export default router;
+export default async function authRoutes(fastify: FastifyInstance) {
+  // Register user
+  fastify.post('/register', {
+    schema: registerSchema
+  }, async (request: FastifyRequest<{
+    Body: { username: string; email: string; password: string }
+  }>, reply) => {
+    try {
+      const { username, email, password } = request.body;
+
+      // Check if user already exists
+      const existingUserByUsername = await UserModel.findByUsername(username);
+      if (existingUserByUsername) {
+        return reply.status(409).send({
+          error: 'Username already exists'
+        });
+      }
+      
+      const existingUserByEmail = await UserModel.findByEmail(email);
+      if (existingUserByEmail) {
+        return reply.status(409).send({
+          error: 'Email already exists'
+        });
+      }
+
+      // Create user
+      const user = await UserModel.create(username, email, password);
+      
+      // Generate JWT token
+      if (!process.env.JWT_SECRET) {
+        throw new Error('JWT_SECRET environment variable is required');
+      }
+      
+      const token = jwt.sign(
+        { id: user.id, username: user.username },
+        process.env.JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+
+      return reply.status(201).send({
+        message: 'User registered successfully',
+        token,
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email
+        }
+      });
+
+    } catch (error: any) {
+      request.log.error(error);
+      return reply.status(500).send({
+        error: 'Internal server error'
+      });
+    }
+  });
+
+  // Login user
+  fastify.post('/login', {
+    schema: loginSchema
+  }, async (request: FastifyRequest<{
+    Body: { username: string; password: string }
+  }>, reply) => {
+    try {
+      const { username, password } = request.body;
+
+      // Find user by username or email
+      let user = await UserModel.findByUsername(username);
+      if (!user) {
+        user = await UserModel.findByEmail(username);
+      }
+      
+      if (!user) {
+        return reply.status(401).send({
+          error: 'Invalid credentials'
+        });
+      }
+
+      // Verify password
+      const isValid = await UserModel.verifyPassword(user, password);
+      if (!isValid) {
+        return reply.status(401).send({
+          error: 'Invalid credentials'
+        });
+      }
+
+      // Generate JWT token
+      if (!process.env.JWT_SECRET) {
+        throw new Error('JWT_SECRET environment variable is required');
+      }
+      
+      const token = jwt.sign(
+        { id: user.id, username: user.username },
+        process.env.JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+
+      return reply.status(200).send({
+        message: 'Login successful',
+        token,
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email
+        }
+      });
+
+    } catch (error: any) {
+      request.log.error(error);
+      return reply.status(500).send({
+        error: 'Internal server error'
+      });
+    }
+  });
+
+  // Regenerate API key (protected route)
+  fastify.post('/regenerate-api-key', {
+    schema: regenerateApiKeySchema,
+    preHandler: authenticateHook
+  }, async (request: FastifyRequest, reply) => {
+    try {
+      const user = (request as any).user;
+      
+      // Generate new API key
+      const apiKey = await UserModel.regenerateApiKey(user.id);
+
+      return reply.status(200).send({
+        message: 'API key generated successfully',
+        apiKey
+      });
+
+    } catch (error: any) {
+      request.log.error(error);
+      return reply.status(500).send({
+        error: 'Internal server error'
+      });
+    }
+  });
+}
