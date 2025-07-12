@@ -7,7 +7,7 @@ let db: any = null;
 export async function getDatabase() {
   if (!db) {
     const dbFilename = process.env.NODE_ENV === 'test' 
-      ? 'test-ccm-registry.db' 
+      ? (process.env.TEST_DB_NAME || 'test-ccm-registry.db')
       : 'ccm-registry.db';
       
     db = await open({

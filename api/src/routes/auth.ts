@@ -93,7 +93,6 @@ const loginSchema = {
 const regenerateApiKeySchema = {
   headers: {
     type: 'object',
-    required: ['authorization'],
     properties: {
       authorization: { type: 'string' }
     }

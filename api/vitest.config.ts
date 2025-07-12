@@ -4,15 +4,14 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    setupFiles: ['./src/tests/setup.ts'],
-    coverage: {
-      reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'dist/', 'src/tests/']
-    }
-  },
-  resolve: {
-    alias: {
-      '@': '/src'
+    setupFiles: ['./src/test/setup.ts'],
+    testTimeout: 10000,
+    hookTimeout: 10000,
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true
+      }
     }
   }
 });
