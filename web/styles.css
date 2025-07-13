@@ -344,10 +344,20 @@ p {
 }
 
 .command-header {
+    margin-bottom: 1rem;
+}
+
+.command-title {
     display: flex;
     justify-content: space-between;
-    align-items: start;
-    margin-bottom: 1rem;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.command-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .command-name {
@@ -389,8 +399,31 @@ p {
 
 .command-stats {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.stat-group {
+    display: flex;
     gap: 1rem;
     align-items: center;
+}
+
+.link-icons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.link-icon {
+    font-size: 1.1rem;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.command-card:hover .link-icon {
+    opacity: 1;
 }
 
 .stat {
@@ -414,6 +447,27 @@ p {
     border-radius: 9999px;
     font-size: 0.75rem;
     font-weight: 500;
+}
+
+/* Badges */
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.badge-category {
+    background: #f0f9ff;
+    color: #0284c7;
+    border: 1px solid #e0f2fe;
+}
+
+.badge-license {
+    background: #fefce8;
+    color: #ca8a04;
+    border: 1px solid #fef3c7;
 }
 
 /* Loading and Error States */
@@ -535,8 +589,80 @@ p {
     margin-bottom: 1.5rem;
 }
 
+.package-metadata {
+    margin-bottom: 2rem;
+}
+
+.package-metadata h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 1rem;
+}
+
+.metadata-grid {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.metadata-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.metadata-item:last-child {
+    border-bottom: none;
+}
+
+.metadata-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+    min-width: 100px;
+}
+
+.metadata-value {
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+.metadata-link {
+    color: #3b82f6;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s ease;
+    font-size: 0.875rem;
+}
+
+.metadata-link:hover {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+.metadata-link svg {
+    opacity: 0.7;
+}
+
 .package-tags {
     margin-bottom: 2rem;
+}
+
+.package-tags h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 1rem;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .install-section {
@@ -714,5 +840,36 @@ p {
     .modal-header,
     .modal-body {
         padding: 1.5rem;
+    }
+    
+    .command-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .command-badges {
+        align-self: stretch;
+    }
+    
+    .command-stats {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .stat-group {
+        flex-wrap: wrap;
+    }
+    
+    .metadata-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .metadata-label {
+        min-width: unset;
+        font-weight: 600;
     }
 }

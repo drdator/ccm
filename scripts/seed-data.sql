@@ -6,13 +6,13 @@ INSERT OR REPLACE INTO users (id, username, email, password_hash, api_key, creat
 VALUES (1, 'ccm-seeder', 'seeder@ccm.dev', '$2b$10$dummyhashforseeding', 'dummy-api-key-for-seeding', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Insert command packages
-INSERT OR REPLACE INTO commands (id, name, version, description, author_id, downloads, published_at, updated_at) VALUES
-(1, 'dev-tools', '1.2.0', 'Essential development productivity commands for coding workflows', 1, 45, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(2, 'ai-prompts', '2.1.0', 'Collection of optimized AI prompts for various tasks and workflows', 1, 78, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(3, 'writing-tools', '1.0.3', 'Professional writing and communication assistance commands', 1, 23, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(4, 'data-science', '1.5.0', 'Data analysis, visualization, and machine learning command helpers', 1, 34, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(5, 'web-dev', '2.0.1', 'Modern web development tools and best practices', 1, 67, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(6, 'security-tools', '1.1.0', 'Security analysis and best practices for secure development', 1, 18, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT OR REPLACE INTO commands (id, name, version, description, repository, license, homepage, category, author_id, downloads, published_at, updated_at) VALUES
+(1, 'dev-tools', '1.2.0', 'Essential development productivity commands for coding workflows', 'https://github.com/ccm-org/dev-tools', 'MIT', 'https://dev-tools.ccm.dev', 'development', 1, 45, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(2, 'ai-prompts', '2.1.0', 'Collection of optimized AI prompts for various tasks and workflows', 'https://github.com/ccm-org/ai-prompts', 'Apache-2.0', 'https://ai-prompts.ccm.dev', 'productivity', 1, 78, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(3, 'writing-tools', '1.0.3', 'Professional writing and communication assistance commands', 'https://github.com/ccm-org/writing-tools', 'MIT', 'https://writing-tools.ccm.dev', 'productivity', 1, 23, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(4, 'data-science', '1.5.0', 'Data analysis, visualization, and machine learning command helpers', 'https://github.com/ccm-org/data-science', 'BSD-3-Clause', 'https://data-science.ccm.dev', 'utility', 1, 34, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(5, 'web-dev', '2.0.1', 'Modern web development tools and best practices', 'https://github.com/ccm-org/web-dev', 'MIT', 'https://web-dev.ccm.dev', 'development', 1, 67, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(6, 'security-tools', '1.1.0', 'Security analysis and best practices for secure development', 'https://github.com/ccm-org/security-tools', 'GPL-3.0', 'https://security-tools.ccm.dev', 'security', 1, 18, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Insert command files
 INSERT OR REPLACE INTO command_files (command_id, filename, content, file_hash) VALUES
