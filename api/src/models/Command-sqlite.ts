@@ -77,12 +77,12 @@ export class CommandModel {
     
     if (version) {
       return await db.get(
-        'SELECT * FROM commands WHERE name = ? AND version = ?',
+        'SELECT c.*, u.username as author_username FROM commands c JOIN users u ON c.author_id = u.id WHERE c.name = ? AND c.version = ?',
         [name, version]
       );
     } else {
       return await db.get(
-        'SELECT * FROM commands WHERE name = ? ORDER BY published_at DESC LIMIT 1',
+        'SELECT c.*, u.username as author_username FROM commands c JOIN users u ON c.author_id = u.id WHERE c.name = ? ORDER BY c.published_at DESC LIMIT 1',
         [name]
       );
     }

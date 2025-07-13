@@ -142,6 +142,7 @@ const getCommandSchema = {
             homepage: { type: 'string' },
             category: { type: 'string' },
             author_id: { type: 'number' },
+            author_username: { type: 'string' },
             downloads: { type: 'number' },
             published_at: { type: 'string' },
             updated_at: { type: 'string' },
