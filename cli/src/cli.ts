@@ -9,6 +9,7 @@ import { register } from './commands/register.js';
 import { publish } from './commands/publish.js';
 import { search } from './commands/search.js';
 import { install } from './commands/install.js';
+import { info } from './commands/info.js';
 import { config } from './commands/config.js';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
@@ -134,6 +135,21 @@ program
       await install(command, {
         version: options.version,
         force: options.force
+      });
+    } catch (error) {
+      console.error(chalk.red('Error:'), error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
+  });
+
+program
+  .command('info <command>')
+  .description('Show detailed information about a command')
+  .option('-v, --version <version>', 'Specific version to get info for')
+  .action(async (command, options) => {
+    try {
+      await info(command, {
+        version: options.version
       });
     } catch (error) {
       console.error(chalk.red('Error:'), error instanceof Error ? error.message : String(error));

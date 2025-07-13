@@ -5,6 +5,40 @@ import { join, relative } from 'path';
 import { ApiClient } from '../utils/api-client.js';
 import { CcmConfig } from '../types/ccm.js';
 
+// Common SPDX license identifiers for validation
+const COMMON_LICENSES = [
+  'MIT', 'Apache-2.0', 'GPL-3.0', 'GPL-2.0', 'LGPL-3.0', 'LGPL-2.1',
+  'BSD-2-Clause', 'BSD-3-Clause', 'ISC', 'MPL-2.0', 'CC0-1.0', 'Unlicense'
+];
+
+// Command categories for validation
+const VALID_CATEGORIES = [
+  'productivity', 'development', 'system', 'utility', 'entertainment', 
+  'education', 'networking', 'security', 'database', 'monitoring'
+];
+
+function validateUrl(url: string, fieldName: string): void {
+  try {
+    new URL(url);
+  } catch {
+    console.log(chalk.yellow(`⚠️  Warning: Invalid ${fieldName} URL: ${url}`));
+  }
+}
+
+function validateLicense(license: string): void {
+  if (!COMMON_LICENSES.includes(license)) {
+    console.log(chalk.yellow(`⚠️  Warning: Uncommon license identifier: ${license}`));
+    console.log(chalk.gray(`   Common licenses: ${COMMON_LICENSES.slice(0, 6).join(', ')}, ...`));
+  }
+}
+
+function validateCategory(category: string): void {
+  if (!VALID_CATEGORIES.includes(category)) {
+    console.log(chalk.yellow(`⚠️  Warning: Uncommon category: ${category}`));
+    console.log(chalk.gray(`   Valid categories: ${VALID_CATEGORIES.slice(0, 5).join(', ')}, ...`));
+  }
+}
+
 interface PublishOptions {
   dry?: boolean;
   tag?: string;
@@ -67,11 +101,36 @@ export async function publish(options: PublishOptions = {}) {
       commands.push({ filename, content });
     }
 
-    // Create command metadata
-    const metadata = `name: ${projectConfig.name}
-version: ${projectConfig.version}
-description: ${projectConfig.description || ''}
-${options.tag ? `tags: [${options.tag}]` : ''}`;
+    // Validate metadata fields
+    if (projectConfig.repository) {
+      validateUrl(projectConfig.repository, 'repository');
+    }
+    if (projectConfig.homepage) {
+      validateUrl(projectConfig.homepage, 'homepage');
+    }
+    if (projectConfig.license) {
+      validateLicense(projectConfig.license);
+    }
+    if (projectConfig.category) {
+      validateCategory(projectConfig.category);
+    }
+
+    // Create command metadata object
+    const metadataObj: any = {
+      name: projectConfig.name,
+      version: projectConfig.version,
+      description: projectConfig.description || '',
+    };
+
+    // Add optional metadata fields
+    if (projectConfig.repository) metadataObj.repository = projectConfig.repository;
+    if (projectConfig.license) metadataObj.license = projectConfig.license;
+    if (projectConfig.homepage) metadataObj.homepage = projectConfig.homepage;
+    if (projectConfig.category) metadataObj.category = projectConfig.category;
+    if (projectConfig.keywords) metadataObj.keywords = projectConfig.keywords;
+    if (options.tag) metadataObj.tags = [options.tag];
+
+    const metadata = JSON.stringify(metadataObj, null, 2);
 
     if (options.dry) {
       console.log(chalk.yellow('\n🔍 Dry run - would publish:'));
@@ -88,7 +147,7 @@ ${options.tag ? `tags: [${options.tag}]` : ''}`;
 
     console.log(chalk.gray('\nPublishing to registry...'));
 
-    const response = await apiClient.publishCommand(metadata, commands);
+    const response = await apiClient.publishCommand(metadataObj, commands);
 
     if (!response.success) {
       console.log(chalk.red('❌ Publish failed:'), response.error);

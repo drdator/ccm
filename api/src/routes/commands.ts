@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 const CommandModel = process.env.NODE_ENV === 'production'
   ? (await import('../models/Command.js')).CommandModel
   : (await import('../models/Command-sqlite.js')).CommandModel;
-import { parseCommandYaml } from '../utils/validation.js';
 
 // Enhanced Fastify schemas with validation
 const listCommandsSchema = {
@@ -29,6 +28,10 @@ const listCommandsSchema = {
               name: { type: 'string' },
               version: { type: 'string' },
               description: { type: 'string' },
+              repository: { type: 'string' },
+              license: { type: 'string' },
+              homepage: { type: 'string' },
+              category: { type: 'string' },
               author_id: { type: 'number' },
               downloads: { type: 'number' },
               published_at: { type: 'string' },
@@ -75,6 +78,10 @@ const searchCommandsSchema = {
               name: { type: 'string' },
               version: { type: 'string' },
               description: { type: 'string' },
+              repository: { type: 'string' },
+              license: { type: 'string' },
+              homepage: { type: 'string' },
+              category: { type: 'string' },
               author_id: { type: 'number' },
               downloads: { type: 'number' },
               published_at: { type: 'string' },
@@ -130,6 +137,10 @@ const getCommandSchema = {
             name: { type: 'string' },
             version: { type: 'string' },
             description: { type: 'string' },
+            repository: { type: 'string' },
+            license: { type: 'string' },
+            homepage: { type: 'string' },
+            category: { type: 'string' },
             author_id: { type: 'number' },
             downloads: { type: 'number' },
             published_at: { type: 'string' },
@@ -170,6 +181,10 @@ const downloadCommandSchema = {
         name: { type: 'string' },
         version: { type: 'string' },
         description: { type: 'string' },
+        repository: { type: 'string' },
+        license: { type: 'string' },
+        homepage: { type: 'string' },
+        category: { type: 'string' },
         author_id: { type: 'number' },
         tags: { type: 'array', items: { type: 'string' } },
         files: {
@@ -204,7 +219,22 @@ const publishCommandSchema = {
     type: 'object',
     required: ['metadata', 'files'],
     properties: {
-      metadata: { type: 'string', minLength: 1 },
+      metadata: { 
+        type: 'object',
+        required: ['name', 'version'],
+        properties: {
+          name: { type: 'string', minLength: 1, maxLength: 100 },
+          version: { type: 'string', minLength: 1, maxLength: 20 },
+          description: { type: 'string', maxLength: 500 },
+          repository: { type: 'string', format: 'uri', maxLength: 200 },
+          license: { type: 'string', maxLength: 50 },
+          homepage: { type: 'string', format: 'uri', maxLength: 200 },
+          category: { type: 'string', maxLength: 50 },
+          keywords: { type: 'array', items: { type: 'string', maxLength: 30 }, maxItems: 10 },
+          tags: { type: 'array', items: { type: 'string', maxLength: 30 }, maxItems: 10 }
+        },
+        additionalProperties: false
+      },
       files: {
         type: 'array',
         minItems: 1,
@@ -243,6 +273,10 @@ const publishCommandSchema = {
             name: { type: 'string' },
             version: { type: 'string' },
             description: { type: 'string' },
+            repository: { type: 'string' },
+            license: { type: 'string' },
+            homepage: { type: 'string' },
+            category: { type: 'string' },
             author_id: { type: 'number' },
             tags: { type: 'array', items: { type: 'string' } }
           }
@@ -478,7 +512,17 @@ export default async function commandRoutes(fastify: FastifyInstance) {
     preHandler: authenticateHook
   }, async (request: FastifyRequest<{
     Body: { 
-      metadata: string; 
+      metadata: {
+        name: string;
+        version: string;
+        description?: string;
+        repository?: string;
+        license?: string;
+        homepage?: string;
+        category?: string;
+        keywords?: string[];
+        tags?: string[];
+      }; 
       files: Array<{ filename: string; content: string }> 
     }
   }>, reply) => {
@@ -488,17 +532,8 @@ export default async function commandRoutes(fastify: FastifyInstance) {
       // Validate command package
       const { metadata, files } = request.body;
       
-      // Parse and validate metadata
-      let parsedMetadata;
-      try {
-        parsedMetadata = parseCommandYaml(metadata);
-      } catch (error: any) {
-        return reply.status(400).send({
-          error: `Invalid metadata format: ${error.message}`
-        });
-      }
-      
-      const { name, version, description, tags } = parsedMetadata;
+      // Extract metadata fields
+      const { name, version, description, repository, license, homepage, category, keywords, tags } = metadata;
       
       if (!name || !version) {
         return reply.status(400).send({
@@ -514,18 +549,34 @@ export default async function commandRoutes(fastify: FastifyInstance) {
         });
       }
       
-      // Create command
+      // Create command with metadata
+      const commandMetadata = {
+        repository,
+        license,
+        homepage,
+        category
+      };
+      
       const command = await CommandModel.create(
         name,
         version,
         description || '',
         userId,
-        files
+        files,
+        commandMetadata
       );
       
-      // Add tags if provided
+      // Add tags and keywords if provided
+      const allTags = [];
       if (tags && Array.isArray(tags)) {
-        await CommandModel.addTags(command.id, tags);
+        allTags.push(...tags);
+      }
+      if (keywords && Array.isArray(keywords)) {
+        allTags.push(...keywords);
+      }
+      
+      if (allTags.length > 0) {
+        await CommandModel.addTags(command.id, allTags);
       }
       
       return reply.status(201).send({

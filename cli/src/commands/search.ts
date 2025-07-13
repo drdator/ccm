@@ -46,6 +46,15 @@ export async function search(query: string, options: SearchOptions = {}) {
         console.log(`    ${chalk.gray(cmd.description)}`);
       }
       
+      // Show metadata fields
+      if (cmd.category) {
+        console.log(`    ${chalk.blue('📁')} ${chalk.blue(cmd.category)}`);
+      }
+      
+      if (cmd.license) {
+        console.log(`    ${chalk.yellow('⚖️')} ${chalk.yellow(cmd.license)}`);
+      }
+      
       if (cmd.author_username) {
         console.log(`    ${chalk.gray(`by ${cmd.author_username}`)}`);
       }
@@ -53,6 +62,18 @@ export async function search(query: string, options: SearchOptions = {}) {
       if (cmd.tags && cmd.tags.length > 0) {
         const tags = cmd.tags.map((tag: string) => chalk.magenta(`#${tag}`)).join(' ');
         console.log(`    ${tags}`);
+      }
+      
+      // Show links
+      const links = [];
+      if (cmd.repository) {
+        links.push(`${chalk.cyan('📦 repo')}`);
+      }
+      if (cmd.homepage) {
+        links.push(`${chalk.green('🏠 home')}`);
+      }
+      if (links.length > 0) {
+        console.log(`    ${links.join(' • ')}`);
       }
       
       if (cmd.downloads > 0) {

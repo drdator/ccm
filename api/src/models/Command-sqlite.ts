@@ -6,6 +6,10 @@ export interface Command {
   name: string;
   version: string;
   description: string;
+  repository?: string;
+  license?: string;
+  homepage?: string;
+  category?: string;
   author_id: number;
   downloads: number;
   published_at: Date;
@@ -26,7 +30,13 @@ export class CommandModel {
     version: string,
     description: string,
     authorId: number,
-    files: Array<{ filename: string; content: string }>
+    files: Array<{ filename: string; content: string }>,
+    metadata?: {
+      repository?: string;
+      license?: string;
+      homepage?: string;
+      category?: string;
+    }
   ): Promise<Command> {
     const db = await getDatabase();
     
@@ -35,8 +45,8 @@ export class CommandModel {
       
       // Insert command
       const commandResult = await db.run(
-        'INSERT INTO commands (name, version, description, author_id) VALUES (?, ?, ?, ?)',
-        [name, version, description, authorId]
+        'INSERT INTO commands (name, version, description, repository, license, homepage, category, author_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [name, version, description, metadata?.repository || null, metadata?.license || null, metadata?.homepage || null, metadata?.category || null, authorId]
       );
       
       const commandId = commandResult.lastID;

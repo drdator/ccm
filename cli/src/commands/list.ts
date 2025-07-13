@@ -53,10 +53,23 @@ function displayCommands(commands: Command[]) {
     
     console.log(`  ${chalk.cyan(name)} ${description}${version}`);
     
+    // Show additional metadata if available
+    const indent = ' '.repeat(maxNameLength + 4);
+    
     // Show tags if available
     if (cmd.metadata.tags && cmd.metadata.tags.length > 0) {
       const tags = cmd.metadata.tags.map(tag => chalk.magenta(`#${tag}`)).join(' ');
-      console.log(`  ${' '.repeat(maxNameLength + 2)} ${tags}`);
+      console.log(`${indent}${tags}`);
+    }
+    
+    // Show author if available
+    if (cmd.metadata.author) {
+      console.log(`${indent}${chalk.gray(`by ${cmd.metadata.author}`)}`);
+    }
+    
+    // Show package info if this is an installed command
+    if (cmd.location === 'installed' && cmd.metadata.package) {
+      console.log(`${indent}${chalk.blue(`📦 ${cmd.metadata.package}`)}`);
     }
   });
 }

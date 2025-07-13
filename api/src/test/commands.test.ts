@@ -9,10 +9,12 @@ describe('Commands API', () => {
   let userId: number;
 
   const testCommand = {
-    metadata: `name: test-command
-version: 1.0.0
-description: A test command package
-tags: ["test", "demo"]`,
+    metadata: {
+      name: 'test-command',
+      version: '1.0.0',
+      description: 'A test command package',
+      tags: ['test', 'demo']
+    },
     files: [
       {
         filename: 'hello.md',
@@ -298,7 +300,10 @@ $ARGUMENTS`
 
     it('should fail with invalid metadata', async () => {
       const invalidCommand = {
-        metadata: 'invalid yaml content',
+        metadata: {
+          name: 'test-invalid'
+          // Missing required version field
+        },
         files: testCommand.files
       };
 
@@ -313,13 +318,15 @@ $ARGUMENTS`
 
       expect(response.statusCode).toBe(400);
       const data = response.json();
-      expect(data.error).toContain('Invalid metadata format');
+      expect(data.error).toBe('Bad Request');
     });
 
     it('should fail with missing required fields', async () => {
       const incompleteCommand = {
-        metadata: `name: test-incomplete
-# Missing version`,
+        metadata: {
+          name: 'test-incomplete'
+          // Missing version
+        },
         files: testCommand.files
       };
 
@@ -334,7 +341,7 @@ $ARGUMENTS`
 
       expect(response.statusCode).toBe(400);
       const data = response.json();
-      expect(data.error).toContain('version');
+      expect(data.error).toBe('Bad Request');
     });
 
     it('should fail with no files', async () => {

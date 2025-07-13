@@ -2,6 +2,11 @@ export interface CcmConfig {
   name: string;
   version: string;
   description?: string;
+  repository?: string;
+  license?: string;
+  homepage?: string;
+  category?: string;
+  keywords?: string[];
   dependencies?: Record<string, string>;
 }
 

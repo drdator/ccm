@@ -93,7 +93,7 @@ export class ApiClient {
     return this.request(`/commands/${name}/download${params}`);
   }
 
-  async publishCommand(metadata: string, files: Array<{ filename: string; content: string }>): Promise<ApiResponse> {
+  async publishCommand(metadata: object, files: Array<{ filename: string; content: string }>): Promise<ApiResponse> {
     return this.request('/commands', {
       method: 'POST',
       body: JSON.stringify({ metadata, files })
