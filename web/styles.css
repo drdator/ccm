@@ -186,6 +186,7 @@ p {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
+
 .code-header {
     background: #374151;
     padding: 1rem 1.5rem;
@@ -238,6 +239,29 @@ p {
 .comment {
     color: #9ca3af;
     font-style: italic;
+}
+
+/* JSON Syntax Highlighting */
+.json-key {
+    color: #60a5fa;
+}
+
+.json-string {
+    color: #34d399;
+}
+
+.json-brace,
+.json-array {
+    color: #fbbf24;
+}
+
+.json-colon,
+.json-comma {
+    color: #e5e7eb;
+}
+
+.json-indent {
+    color: transparent;
 }
 
 .code-block.small {

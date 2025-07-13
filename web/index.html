@@ -197,33 +197,92 @@
             <div class="publishing-info">
                 <h4>Publishing Your Own Commands</h4>
                 <div class="code-block">
-                    <code>
-# Create a new command package<br>
-mkdir my-commands && cd my-commands<br>
-ccm init --name "my-utils"<br><br>
-# Create commands in commands/ directory<br>
-echo "# Hello Command" > commands/hello.md<br><br>
-# Register and publish<br>
-ccm register<br>
-ccm publish
-                    </code>
+                    <div class="code-header">
+                        <span class="code-title">Terminal</span>
+                        <div class="code-dots">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <div class="code-line">
+                            <span class="comment"># Create a new command package</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="prompt">$</span>
+                            <span class="command">mkdir my-commands && cd my-commands</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="prompt">$</span>
+                            <span class="command">ccm init --name "my-utils"</span>
+                        </div>
+                        <div class="code-line"></div>
+                        <div class="code-line">
+                            <span class="comment"># Create commands in commands/ directory</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="prompt">$</span>
+                            <span class="command">echo "# Hello Command" > commands/hello.md</span>
+                        </div>
+                        <div class="code-line"></div>
+                        <div class="code-line">
+                            <span class="comment"># Register and publish</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="prompt">$</span>
+                            <span class="command">ccm register</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="prompt">$</span>
+                            <span class="command">ccm publish</span>
+                        </div>
+                    </div>
                 </div>
                 
                 <h5 style="margin-top: 2rem; margin-bottom: 1rem;">Package Metadata</h5>
                 <p style="margin-bottom: 1rem; color: #6b7280;">Enhance your package with rich metadata in <code>ccm.json</code>:</p>
                 <div class="code-block">
-                    <code>
-{<br>
-&nbsp;&nbsp;"name": "my-dev-tools",<br>
-&nbsp;&nbsp;"version": "1.0.0",<br>
-&nbsp;&nbsp;"description": "Essential development utilities",<br>
-&nbsp;&nbsp;"category": "development",<br>
-&nbsp;&nbsp;"license": "MIT",<br>
-&nbsp;&nbsp;"repository": "https://github.com/user/my-dev-tools",<br>
-&nbsp;&nbsp;"homepage": "https://mydocs.com",<br>
-&nbsp;&nbsp;"keywords": ["git", "docker", "productivity"]<br>
-}
-                    </code>
+                    <div class="code-header">
+                        <span class="code-title">ccm.json</span>
+                        <div class="code-dots">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <div class="code-line">
+                            <span class="json-brace">{</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="json-indent">  </span><span class="json-key">"name"</span><span class="json-colon">:</span> <span class="json-string">"my-dev-tools"</span><span class="json-comma">,</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="json-indent">  </span><span class="json-key">"version"</span><span class="json-colon">:</span> <span class="json-string">"1.0.0"</span><span class="json-comma">,</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="json-indent">  </span><span class="json-key">"description"</span><span class="json-colon">:</span> <span class="json-string">"Essential development utilities"</span><span class="json-comma">,</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="json-indent">  </span><span class="json-key">"category"</span><span class="json-colon">:</span> <span class="json-string">"development"</span><span class="json-comma">,</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="json-indent">  </span><span class="json-key">"license"</span><span class="json-colon">:</span> <span class="json-string">"MIT"</span><span class="json-comma">,</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="json-indent">  </span><span class="json-key">"repository"</span><span class="json-colon">:</span> <span class="json-string">"https://github.com/user/my-dev-tools"</span><span class="json-comma">,</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="json-indent">  </span><span class="json-key">"homepage"</span><span class="json-colon">:</span> <span class="json-string">"https://mydocs.com"</span><span class="json-comma">,</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="json-indent">  </span><span class="json-key">"keywords"</span><span class="json-colon">:</span> <span class="json-array">[</span><span class="json-string">"git"</span><span class="json-comma">,</span> <span class="json-string">"docker"</span><span class="json-comma">,</span> <span class="json-string">"productivity"</span><span class="json-array">]</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="json-brace">}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
