@@ -101,8 +101,12 @@ export class ApiClient {
   }
 
   // Configuration
-  saveAuth(token: string, username: string, apiKey: string): void {
-    this.config.saveConfig({ token, username, apiKey });
+  saveAuth(token: string, username: string, apiKey?: string): void {
+    const authData: any = { token, username };
+    if (apiKey) {
+      authData.apiKey = apiKey;
+    }
+    this.config.saveConfig(authData);
   }
 
   clearAuth(): void {

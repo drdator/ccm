@@ -14,7 +14,9 @@ export class ApiConfigManager {
   private config: ApiConfig;
 
   constructor() {
-    const configDir = join(homedir(), '.ccm');
+    // Respect HOME environment variable if set (for testing)
+    const homeDirectory = process.env.HOME || homedir();
+    const configDir = join(homeDirectory, '.ccm');
     this.configPath = join(configDir, 'config.json');
     
     // Ensure config directory exists
@@ -26,8 +28,24 @@ export class ApiConfigManager {
   }
 
   private loadConfig(): ApiConfig {
+    // Default to production URL, but allow development override
+    const getDefaultRegistryUrl = () => {
+      // Always prioritize explicit CCM_REGISTRY_URL if set
+      if (process.env.CCM_REGISTRY_URL) {
+        return process.env.CCM_REGISTRY_URL;
+      }
+      
+      // Check if we're in development environment
+      if (process.env.NODE_ENV === 'development' || process.env.CCM_DEV === 'true') {
+        return 'http://localhost:3000/api';
+      }
+      
+      // Production default - this should be updated when you have a production URL
+      return 'http://localhost:3000/api';
+    };
+
     const defaultConfig: ApiConfig = {
-      registryUrl: process.env.CCM_REGISTRY_URL || 'http://localhost:3000/api'
+      registryUrl: getDefaultRegistryUrl()
     };
 
     if (!existsSync(this.configPath)) {
