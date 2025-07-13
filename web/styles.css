@@ -14,6 +14,7 @@ body {
     line-height: 1.6;
     color: #1f2937;
     background-color: #ffffff;
+    -webkit-font-smoothing: antialiased;
 }
 
 /* Typography */
@@ -193,6 +194,7 @@ p {
     font-size: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    border-radius: 3px;
 }
 
 .btn-primary {
@@ -222,7 +224,7 @@ p {
 /* Code Block */
 .code-block {
     background: #121b26;
-    border-radius: 0.75rem;
+    border-radius: 6px;
     overflow: hidden;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
@@ -629,7 +631,7 @@ p {
     padding: 0.25rem 0.75rem;
     font-size: 0.875rem;
     font-weight: 600;
-    border: 2px solid #ff0062;
+    border-radius: 3px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
