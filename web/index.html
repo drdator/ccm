@@ -72,48 +72,211 @@
         </div>
     </section>
 
-    <!-- Search Section -->
-    <section id="commands" class="search-section">
+    <!-- Getting Started Section -->
+    <section id="getting-started" class="getting-started">
         <div class="container">
-            <h3 class="section-title">Browse Command Packages</h3>
-            <div class="search-container">
-                <input 
-                    type="text" 
-                    id="search-input" 
-                    class="search-input" 
-                    placeholder="Search for command packages..."
-                    autocomplete="off"
-                >
-                <button id="search-btn" class="search-btn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <path d="m21 21-4.35-4.35"></path>
-                    </svg>
-                </button>
+            <h3 class="section-title">Getting Started</h3>
+            <div class="steps-grid">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h4>Install CCM CLI</h4>
+                    <div class="code-block small">
+                        <code>npm install -g ccm-cli</code>
+                    </div>
+                    <p>Install the CCM command-line tool globally on your system.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h4>Search & Install</h4>
+                    <div class="code-block small">
+                        <code>ccm search git<br>ccm install dev-tools</code>
+                    </div>
+                    <p>Find useful command packages and install them in your project.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h4>Use in Claude Code</h4>
+                    <div class="code-block small">
+                        <code>/dev-tools/git-helper</code>
+                    </div>
+                    <p>Access installed commands in Claude Code with package namespacing.</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Commands Grid -->
-    <section class="commands-section">
+    <!-- Browse Commands Section -->
+    <section id="commands" class="browse-section">
         <div class="container">
-            <div id="loading" class="loading">
-                <div class="spinner"></div>
-                <p>Loading command packages...</p>
-            </div>
+            <h3 class="section-title">Browse Command Packages</h3>
             
-            <div id="error" class="error" style="display: none;">
-                <p>Unable to load commands. Make sure the API server is running.</p>
-                <button onclick="loadCommands()" class="btn btn-secondary">Retry</button>
+            <!-- Popular Packages -->
+            <div class="popular-subsection">
+                <h4 class="subsection-title">Popular Packages</h4>
+                <div id="popular-loading" class="loading-inline">
+                    <div class="spinner-small"></div>
+                </div>
+                <div id="popular-packages" class="popular-grid">
+                    <!-- Popular packages will be loaded here -->
+                </div>
             </div>
-            
-            <div id="commands-grid" class="commands-grid">
-                <!-- Commands will be loaded here -->
+
+            <!-- Search -->
+            <div class="search-subsection">
+                <h4 class="subsection-title">Search All Packages</h4>
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        class="search-input" 
+                        placeholder="Search for command packages..."
+                        autocomplete="off"
+                    >
+                    <button id="search-btn" class="search-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
-            
-            <div id="no-results" class="no-results" style="display: none;">
-                <h4>No packages found</h4>
-                <p>Try a different search term or browse all available packages.</p>
+
+            <!-- Commands Grid -->
+            <div class="commands-subsection">
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading command packages...</p>
+                </div>
+                
+                <div id="error" class="error" style="display: none;">
+                    <p>Unable to load commands. Make sure the API server is running.</p>
+                    <button onclick="loadCommands()" class="btn btn-secondary">Retry</button>
+                </div>
+                
+                <div id="commands-grid" class="commands-grid">
+                    <!-- Commands will be loaded here -->
+                </div>
+                
+                <div id="no-results" class="no-results" style="display: none;">
+                    <h4>No packages found</h4>
+                    <p>Try a different search term or browse all available packages.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Publishing Section -->
+    <section class="publishing-section">
+        <div class="container">
+            <h3 class="section-title">Publishing Your Own Commands</h3>
+            <div class="publishing-content">
+                <div class="publishing-intro">
+                    <p>Share your custom Claude Code commands with the community. CCM makes it easy to package, publish, and distribute your productivity tools.</p>
+                </div>
+                
+                <div class="publishing-steps">
+                    <div class="publishing-step">
+                        <h4>Create Package</h4>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Terminal</span>
+                                <div class="code-dots">
+                                    <span class="dot red"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot green"></span>
+                                </div>
+                            </div>
+                            <div class="code-content">
+                                <div class="code-line">
+                                    <span class="comment"># Create a new command package</span>
+                                </div>
+                                <div class="code-line">
+                                    <span class="prompt">$</span>
+                                    <span class="command">mkdir my-commands && cd my-commands</span>
+                                </div>
+                                <div class="code-line">
+                                    <span class="prompt">$</span>
+                                    <span class="command">ccm init --name "my-utils"</span>
+                                </div>
+                                <div class="code-line"></div>
+                                <div class="code-line">
+                                    <span class="comment"># Create commands in commands/ directory</span>
+                                </div>
+                                <div class="code-line">
+                                    <span class="prompt">$</span>
+                                    <span class="command">echo "# Hello Command" > commands/hello.md</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="publishing-step">
+                        <h4>Configure Metadata</h4>
+                        <p>Enhance your package with rich metadata in <code>ccm.json</code>:</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">ccm.json</span>
+                                <div class="code-dots">
+                                    <span class="dot red"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot green"></span>
+                                </div>
+                            </div>
+                            <div class="code-content">
+                                <div class="code-line">
+                                    <span class="json-brace">{</span>
+                                </div>
+                                <div class="code-line">
+                                    <span class="json-indent">  </span><span class="json-key">"name"</span><span class="json-colon">:</span> <span class="json-string">"my-dev-tools"</span><span class="json-comma">,</span>
+                                </div>
+                                <div class="code-line">
+                                    <span class="json-indent">  </span><span class="json-key">"version"</span><span class="json-colon">:</span> <span class="json-string">"1.0.0"</span><span class="json-comma">,</span>
+                                </div>
+                                <div class="code-line">
+                                    <span class="json-indent">  </span><span class="json-key">"category"</span><span class="json-colon">:</span> <span class="json-string">"development"</span><span class="json-comma">,</span>
+                                </div>
+                                <div class="code-line">
+                                    <span class="json-indent">  </span><span class="json-key">"license"</span><span class="json-colon">:</span> <span class="json-string">"MIT"</span><span class="json-comma">,</span>
+                                </div>
+                                <div class="code-line">
+                                    <span class="json-indent">  </span><span class="json-key">"repository"</span><span class="json-colon">:</span> <span class="json-string">"https://github.com/user/my-dev-tools"</span>
+                                </div>
+                                <div class="code-line">
+                                    <span class="json-brace">}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="publishing-step">
+                        <h4>Publish</h4>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Terminal</span>
+                                <div class="code-dots">
+                                    <span class="dot red"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot green"></span>
+                                </div>
+                            </div>
+                            <div class="code-content">
+                                <div class="code-line">
+                                    <span class="comment"># Register and publish</span>
+                                </div>
+                                <div class="code-line">
+                                    <span class="prompt">$</span>
+                                    <span class="command">ccm register</span>
+                                </div>
+                                <div class="code-line">
+                                    <span class="prompt">$</span>
+                                    <span class="command">ccm publish</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -160,133 +323,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Getting Started Section -->
-    <section id="getting-started" class="getting-started">
-        <div class="container">
-            <h3 class="section-title">Getting Started</h3>
-            <div class="steps-grid">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h4>Install CCM CLI</h4>
-                    <div class="code-block small">
-                        <code>npm install -g ccm-cli</code>
-                    </div>
-                    <p>Install the CCM command-line tool globally on your system.</p>
-                </div>
-                
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h4>Search & Install</h4>
-                    <div class="code-block small">
-                        <code>ccm search git<br>ccm install dev-tools</code>
-                    </div>
-                    <p>Find useful command packages and install them in your project.</p>
-                </div>
-                
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h4>Use in Claude Code</h4>
-                    <div class="code-block small">
-                        <code>/dev-tools/git-helper</code>
-                    </div>
-                    <p>Access installed commands in Claude Code with package namespacing.</p>
-                </div>
-            </div>
-            
-            <div class="publishing-info">
-                <h4>Publishing Your Own Commands</h4>
-                <div class="code-block">
-                    <div class="code-header">
-                        <span class="code-title">Terminal</span>
-                        <div class="code-dots">
-                            <span class="dot red"></span>
-                            <span class="dot yellow"></span>
-                            <span class="dot green"></span>
-                        </div>
-                    </div>
-                    <div class="code-content">
-                        <div class="code-line">
-                            <span class="comment"># Create a new command package</span>
-                        </div>
-                        <div class="code-line">
-                            <span class="prompt">$</span>
-                            <span class="command">mkdir my-commands && cd my-commands</span>
-                        </div>
-                        <div class="code-line">
-                            <span class="prompt">$</span>
-                            <span class="command">ccm init --name "my-utils"</span>
-                        </div>
-                        <div class="code-line"></div>
-                        <div class="code-line">
-                            <span class="comment"># Create commands in commands/ directory</span>
-                        </div>
-                        <div class="code-line">
-                            <span class="prompt">$</span>
-                            <span class="command">echo "# Hello Command" > commands/hello.md</span>
-                        </div>
-                        <div class="code-line"></div>
-                        <div class="code-line">
-                            <span class="comment"># Register and publish</span>
-                        </div>
-                        <div class="code-line">
-                            <span class="prompt">$</span>
-                            <span class="command">ccm register</span>
-                        </div>
-                        <div class="code-line">
-                            <span class="prompt">$</span>
-                            <span class="command">ccm publish</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <h5 style="margin-top: 2rem; margin-bottom: 1rem;">Package Metadata</h5>
-                <p style="margin-bottom: 1rem; color: #6b7280;">Enhance your package with rich metadata in <code>ccm.json</code>:</p>
-                <div class="code-block">
-                    <div class="code-header">
-                        <span class="code-title">ccm.json</span>
-                        <div class="code-dots">
-                            <span class="dot red"></span>
-                            <span class="dot yellow"></span>
-                            <span class="dot green"></span>
-                        </div>
-                    </div>
-                    <div class="code-content">
-                        <div class="code-line">
-                            <span class="json-brace">{</span>
-                        </div>
-                        <div class="code-line">
-                            <span class="json-indent">  </span><span class="json-key">"name"</span><span class="json-colon">:</span> <span class="json-string">"my-dev-tools"</span><span class="json-comma">,</span>
-                        </div>
-                        <div class="code-line">
-                            <span class="json-indent">  </span><span class="json-key">"version"</span><span class="json-colon">:</span> <span class="json-string">"1.0.0"</span><span class="json-comma">,</span>
-                        </div>
-                        <div class="code-line">
-                            <span class="json-indent">  </span><span class="json-key">"description"</span><span class="json-colon">:</span> <span class="json-string">"Essential development utilities"</span><span class="json-comma">,</span>
-                        </div>
-                        <div class="code-line">
-                            <span class="json-indent">  </span><span class="json-key">"category"</span><span class="json-colon">:</span> <span class="json-string">"development"</span><span class="json-comma">,</span>
-                        </div>
-                        <div class="code-line">
-                            <span class="json-indent">  </span><span class="json-key">"license"</span><span class="json-colon">:</span> <span class="json-string">"MIT"</span><span class="json-comma">,</span>
-                        </div>
-                        <div class="code-line">
-                            <span class="json-indent">  </span><span class="json-key">"repository"</span><span class="json-colon">:</span> <span class="json-string">"https://github.com/user/my-dev-tools"</span><span class="json-comma">,</span>
-                        </div>
-                        <div class="code-line">
-                            <span class="json-indent">  </span><span class="json-key">"homepage"</span><span class="json-colon">:</span> <span class="json-string">"https://mydocs.com"</span><span class="json-comma">,</span>
-                        </div>
-                        <div class="code-line">
-                            <span class="json-indent">  </span><span class="json-key">"keywords"</span><span class="json-colon">:</span> <span class="json-array">[</span><span class="json-string">"git"</span><span class="json-comma">,</span> <span class="json-string">"docker"</span><span class="json-comma">,</span> <span class="json-string">"productivity"</span><span class="json-array">]</span>
-                        </div>
-                        <div class="code-line">
-                            <span class="json-brace">}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Footer -->
     <footer class="footer">
