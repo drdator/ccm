@@ -10,7 +10,11 @@
     "build": "tsc",
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:e2e": "vitest --run tests/e2e/scenarios/auth-flow.test.ts && vitest --run tests/e2e/scenarios/publisher-flow.test.ts && vitest --run tests/e2e/scenarios/consumer-flow.test.ts",
+    "test:e2e:parallel": "vitest --run tests/e2e"
   },
   "keywords": [
     "claude",
@@ -24,8 +28,10 @@
   "devDependencies": {
     "@types/commander": "^2.12.0",
     "@types/node": "^24.0.13",
+    "@vitest/ui": "^0.34.7",
     "tsx": "^4.20.3",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^0.34.6"
   },
   "dependencies": {
     "@types/inquirer": "^9.0.8",

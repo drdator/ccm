@@ -115,13 +115,12 @@ export async function register(options: RegisterOptions = {}) {
 
     // Save authentication details
     const { user, token } = response.data;
-    apiClient.saveAuth(token, user.username, user.api_key);
+    apiClient.saveAuth(token, user.username);
 
     console.log(chalk.green('✅ Account created successfully!'));
     console.log(chalk.gray('─'.repeat(45)));
     console.log(chalk.white(`Username: ${chalk.cyan(user.username)}`));
     console.log(chalk.white(`Email: ${chalk.gray(user.email)}`));
-    console.log(chalk.white(`API Key: ${chalk.gray(`${user.api_key.substring(0, 8)}...`)}`));
     
     console.log(chalk.blue('\n🎯 You can now:'));
     console.log(chalk.gray('• Publish commands: ccm publish'));
@@ -129,8 +128,8 @@ export async function register(options: RegisterOptions = {}) {
     console.log(chalk.gray('• Search commands: ccm search <query>'));
 
     console.log(chalk.yellow('\n⚠️  Important:'));
-    console.log(chalk.gray('• Keep your API key secure'));
-    console.log(chalk.gray('• Regenerate it if compromised: ccm whoami --regenerate-key'));
+    console.log(chalk.gray('• Your session token is now saved locally'));
+    console.log(chalk.gray('• Use ccm logout to clear your session'));
 
   } catch (error) {
     console.error(chalk.red('❌ Registration failed:'));
