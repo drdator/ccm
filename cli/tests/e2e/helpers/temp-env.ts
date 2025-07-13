@@ -177,4 +177,13 @@ $ARGUMENTS
   getTestPassword(): string {
     return 'TestPass123!';
   }
+
+  /**
+   * Get a unique project name for testing
+   */
+  getUniqueProjectName(prefix = 'test-project'): string {
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(7);
+    return `${prefix}-${timestamp}-${random}`;
+  }
 }

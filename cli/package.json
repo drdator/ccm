@@ -13,7 +13,8 @@
     "test": "vitest --run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "test:e2e": "vitest --run tests/e2e"
+    "test:e2e": "vitest --run tests/e2e/scenarios/auth-flow.test.ts && vitest --run tests/e2e/scenarios/publisher-flow.test.ts && vitest --run tests/e2e/scenarios/consumer-flow.test.ts",
+    "test:e2e:parallel": "vitest --run tests/e2e"
   },
   "keywords": [
     "claude",
