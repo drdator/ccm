@@ -10,7 +10,8 @@
     "migrate": "tsx src/database/migrate.ts",
     "test": "vitest --run",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage --run"
+    "test:coverage": "vitest --coverage --run",
+    "test:cleanup": "node cleanup-test-dbs.js"
   },
   "keywords": [
     "claude",
