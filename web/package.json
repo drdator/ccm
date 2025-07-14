@@ -4,9 +4,10 @@
   "description": "CCM Registry Web Interface - Browse and discover Claude Code command packages",
   "main": "index.html",
   "scripts": {
-    "dev": "python -m http.server 8080 || python3 -m http.server 8080",
-    "serve": "npx serve . -s -p 8080",
-    "build": "echo 'Static site - no build required'"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "npx serve dist -s -p 8080"
   },
   "keywords": [
     "claude",
@@ -18,6 +19,8 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "serve": "^14.2.1"
-  }
+    "serve": "^14.2.1",
+    "vite": "^5.4.19"
+  },
+  "type": "module"
 }
