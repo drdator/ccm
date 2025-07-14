@@ -5,10 +5,15 @@ node_modules/
 # Build output
 dist/
 */dist/
-*.js
 *.js.map
 *.d.ts
 *.d.ts.map
+
+# Compiled TypeScript (but keep source JS files)
+api/dist/
+cli/dist/
+api/**/*.js
+cli/**/*.js
 
 # IDE
 .vscode/
