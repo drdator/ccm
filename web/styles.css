@@ -195,7 +195,7 @@ p {
     font-size: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    border-radius: 3px;
+    border-radius: 1px;
 }
 
 .btn-primary {
@@ -206,7 +206,6 @@ p {
 .btn-primary:hover {
     background: #ffffff;
     color: #ff0062;
-    box-shadow: 0 0 0 2px #ff0062;
 }
 
 .btn-secondary {
@@ -583,7 +582,7 @@ p {
     border-radius: 9999px;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 /* Commands Grid */
