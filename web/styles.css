@@ -361,33 +361,36 @@ p {
     outline: none;
     background: #ffffff;
     font-weight: 500;
+    position: relative;
+    z-index: 0;
 }
 
 .search-input:focus {
-    background: #f8f9fa;
     border-color: #ff0062;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
 }
 
 .search-btn {
     position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    background: #ff0062;
+    right: 2px;
+    top: 2px;
+    bottom: 2px;
+    background: transparent;
     border: none;
     border-radius: 0 4px 4px 0;
-    color: #ffffff;
+    color: #ff0062;
     cursor: pointer;
     padding: 0 1.5rem;
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 1;
 }
 
 .search-btn:hover {
-    background: #ffffff;
-    color: #ff0062;
+    background: #ff0062;
+    color: #ffffff;
 }
 
 /* Browse Commands Section */
