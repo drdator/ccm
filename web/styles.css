@@ -982,41 +982,78 @@ p {
 .command-files {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 1rem;
 }
 
 .command-file {
-    background: #f8fafc;
-    padding: 1rem;
-    border-radius: 6px;
-    border: 1px solid #e2e8f0;
-    border-left: 3px solid #ff0062;
+    background: #ffffff;
+    padding: 1.25rem;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.command-file::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #ff0062;
 }
 
 .command-file-name {
     font-family: 'Fira Code', Monaco, monospace;
     font-size: 0.875rem;
-    color: #ff0062;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
+    color: #64748b;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.command-file-name::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2364748b" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14,2 14,8 20,8"></polyline></svg>') no-repeat center;
+    opacity: 0.5;
 }
 
 .command-file-usage {
     font-family: 'Fira Code', Monaco, monospace;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
+    color: #1f2937;
+    background: #f8fafc;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+    position: relative;
+}
+
+.command-file-usage::before {
+    content: '$';
     color: #ff0062;
-    background: #fef2f2;
-    padding: 0.5rem;
-    border: 1px solid rgba(255, 0, 98, 0.2);
-    border-radius: 4px;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
+    font-weight: 700;
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .command-file-description {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     color: #6b7280;
     margin: 0;
+    line-height: 1.5;
 }
 
 /* Getting Started Section */
