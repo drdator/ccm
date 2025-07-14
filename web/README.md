@@ -5,11 +5,15 @@ A modern web interface for browsing and discovering Claude Code command packages
 ## Features
 
 - **Browse Commands**: View all available command packages
-- **Search**: Find packages by name or description
-- **Package Details**: View detailed information about each package
+- **Search**: Find packages by name or description  
+- **Popular Packages**: Horizontal scrolling section of top downloads
+- **Package Details**: View detailed information about each package with client-side routing
 - **Installation Instructions**: Copy-paste install commands
+- **Modern Design**: Square/contrasty design with pink accent color
 - **Responsive Design**: Works on desktop and mobile
 - **Real-time Data**: Fetches live data from the CCM API
+- **SVG Icons**: Modern icon design throughout
+- **Client-side Routing**: Direct package URLs like `/package/security-tools`
 
 ## Quick Start
 
@@ -21,16 +25,12 @@ A modern web interface for browsing and discovering Claude Code command packages
 ### Running Locally
 
 ```bash
-# Option 1: Using Python (simple)
+# Using Vite dev server (recommended)
 cd web
-python -m http.server 8080
-# or python3 -m http.server 8080
-
-# Option 2: Using Node.js serve
 npm install
-npm run serve
+npm run dev
 
-# Option 3: From project root
+# Or from project root
 npm run dev:web
 ```
 
@@ -63,9 +63,10 @@ For production deployment, update this to your deployed API URL.
 ```
 web/
 ├── index.html          # Main HTML page
-├── styles.css          # CSS styling
-├── script.js           # JavaScript functionality
-├── package.json        # Node.js dependencies
+├── styles.css          # CSS styling  
+├── script.js           # JavaScript functionality with client-side routing
+├── vite.config.js      # Vite configuration for dev server
+├── package.json        # Node.js dependencies including Vite
 └── README.md          # This file
 ```
 
@@ -115,23 +116,25 @@ Uses modern web features:
 
 ## Development
 
-The website is a static single-page application using vanilla HTML, CSS, and JavaScript. No build step required for development.
+The website is a single-page application using vanilla HTML, CSS, and JavaScript with Vite for development.
 
 ### Local Development
 
 1. Start the API server: `npm run dev:api`
-2. Start the web server: `npm run dev:web`
+2. Start the Vite dev server: `npm run dev:web`
 3. Open http://localhost:8080
 4. Make changes to HTML/CSS/JS files
-5. Refresh browser to see changes
+5. Vite hot-reloads changes automatically
 
 ### Deployment
 
 For production deployment:
 
 1. Update `API_BASE_URL` in `script.js` to your production API
-2. Deploy static files to any web server or CDN
-3. Ensure CORS is configured on your API server
+2. Build for production: `npm run build`  
+3. Deploy `dist/` folder to any web server or CDN
+4. Ensure CORS is configured on your API server
+5. Configure server to handle client-side routing (SPA fallback)
 
 ## Contributing
 

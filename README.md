@@ -98,8 +98,7 @@ npm run dev:web
 - `npm run dev:api` - Run API server (Native Fastify, auto-creates SQLite DB)
 - `npm run dev:web` - Run web interface (http://localhost:8080)
 - `npm run build` - Build all components
-- `npm run migrate` - Run database migrations (for SQLite)
-- `sqlite3 ccm-registry.db < scripts/seed-data.sql` - Seed database with example commands
+- `npm run db:seed --workspace=api` - Seed SQLite database with example commands
 
 ## API Framework (2025 Modern Stack)
 
