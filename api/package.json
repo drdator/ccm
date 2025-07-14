@@ -7,11 +7,11 @@
     "build": "tsc",
     "dev": "nodemon --exec tsx src/index.ts",
     "start": "node dist/index.js",
-    "migrate": "tsx src/database/migrate.ts",
     "test": "vitest --run",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage --run",
-    "test:cleanup": "node cleanup-test-dbs.js"
+    "test:cleanup": "node cleanup-test-dbs.js",
+    "db:seed": "sqlite3 ccm-registry.db < ../scripts/seed-data.sql"
   },
   "keywords": [
     "claude",
@@ -31,7 +31,6 @@
     "dotenv": "^17.2.0",
     "fastify": "^5.4.0",
     "jsonwebtoken": "^9.0.2",
-    "pg": "^8.16.3",
     "pino": "^9.7.0",
     "pino-pretty": "^13.0.0",
     "sqlite": "^5.1.1",
@@ -42,7 +41,6 @@
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.0.13",
-    "@types/pg": "^8.15.4",
     "@types/sqlite3": "^3.1.11",
     "@types/supertest": "^2.0.12",
     "@types/yaml": "^1.9.6",
