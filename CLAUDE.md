@@ -1,6 +1,6 @@
 # CCM - Claude Command Manager
 
-A comprehensive package manager for Claude Code commands, designed to function like npm for JavaScript but specifically for Claude AI productivity commands.
+A comprehensive package manager for Claude Code commands, designed to function like npm for JavaScript but specifically for Claude Code slash commands.
 
 ## Overview
 

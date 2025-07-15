@@ -27,7 +27,7 @@ const program = new Command();
 
 program
   .name('ccm')
-  .description('Claude Command Manager - Package manager for Claude Code custom commands')
+  .description('Claude Command Manager - Package manager for Claude Code slash commands')
   .version(packageJson.version);
 
 // Init command
