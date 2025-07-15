@@ -320,6 +320,17 @@ p {
     font-size: 0.875rem;
     line-height: 1.5;
     margin: 0;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: none;
+    white-space: pre-wrap;
+}
+
+/* Special styling for install commands with long URLs */
+.install-command code {
+    font-size: 0.8rem !important;
+    line-height: 1.4 !important;
+    word-break: break-all;
 }
 
 .copy-btn {
@@ -1183,6 +1194,17 @@ p {
     .modal-content {
         margin: 1rem;
         max-height: calc(100vh - 2rem);
+    }
+    
+    .code-block.small code {
+        font-size: 0.75rem;
+        padding: 0.875rem 1rem;
+        line-height: 1.4;
+    }
+    
+    .install-command code {
+        font-size: 0.7rem !important;
+        line-height: 1.3 !important;
     }
     
     .modal-header,
