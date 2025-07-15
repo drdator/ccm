@@ -20,13 +20,12 @@ npm run build
 npm link
 ```
 
-### Configure Registry
+### Ready to Use (Registry Pre-configured)
+
+The CLI comes pre-configured with the official registry at `https://claudecommands.dev/api`.
 
 ```bash
-# Use the official registry
-ccm config --registry https://claudecommands.dev/api
-
-# Or run your own registry locally
+# Optional: Override registry for development
 ccm config --registry http://localhost:3000/api
 ```
 

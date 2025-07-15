@@ -40,8 +40,8 @@ export class ApiConfigManager {
         return 'http://localhost:3000/api';
       }
       
-      // Production default - this should be updated when you have a production URL
-      return 'http://localhost:3000/api';
+      // Production default
+      return 'https://claudecommands.dev/api';
     };
 
     const defaultConfig: ApiConfig = {
