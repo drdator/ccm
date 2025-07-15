@@ -1,11 +1,16 @@
 {
   "name": "ccm",
   "version": "0.1.0",
-  "description": "CCM is a command manager for Claude AI, like NPM for JavaScript or pip for Python dependencies.",
+  "description": "CCM - Claude Command Manager: A package manager for Claude Code slash commands",
   "main": "dist/index.js",
   "bin": {
     "ccm": "./dist/cli.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/drdator/ccm.git"
+  },
+  "homepage": "https://claudecommands.dev",
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/cli.ts",
@@ -20,9 +25,11 @@
     "claude",
     "ai",
     "commands",
-    "package-manager"
+    "package-manager",
+    "claude-code",
+    "cli"
   ],
-  "author": "",
+  "author": "CCM Contributors",
   "license": "MIT",
   "type": "module",
   "devDependencies": {

@@ -25,15 +25,17 @@
     "ai",
     "commands",
     "package-manager",
+    "claude-code",
     "monorepo"
   ],
-  "author": "",
+  "author": "CCM Contributors",
   "license": "MIT",
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/ccm.git"
-  }
+    "url": "https://github.com/drdator/ccm.git"
+  },
+  "homepage": "https://claudecommands.dev"
 }

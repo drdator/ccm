@@ -1,118 +1,223 @@
 # CCM - Claude Command Manager
 
-CCM is a package manager for Claude AI commands, like NPM for JavaScript or pip for Python. It allows you to publish and share command sets (packages) that contain multiple Claude Code slash commands.
+> **Live Demo**: [https://claudecommands.dev](https://claudecommands.dev)
 
-## Key Concepts
+CCM is a package manager for Claude Code slash commands, like npm for JavaScript or pip for Python. Discover, install, and share command packages that enhance your Claude Code productivity.
 
-- **Command Sets**: Groups of related commands published together as a package
-- **Namespaced Access**: Commands are accessed with their package name (e.g., `/my-project/hello`)
-- **No Conflicts**: Multiple packages can have commands with the same name
-- **Version Management**: Entire command sets are versioned together
-- **Dual Structure**: Publishers work in root structure, consumers work in `.claude/` structure
+## 🚀 Quick Start
 
-## Workflows
+### Install CCM CLI
 
-### Publisher Workflow (Creating Commands)
 ```bash
-# Create a new command set
-mkdir my-commands && cd my-commands
-ccm init --name "my-utils"
+# Install globally from GitHub
+npm install -g https://github.com/drdator/ccm.git
 
-# Create commands in commands/ directory
-echo "# Hello Command" > commands/hello.md
-
-# Publish to registry
-ccm publish
-```
-
-### Consumer Workflow (Using Commands)
-```bash
-# Use commands in any project
-cd my-project
-ccm install my-utils
-
-# Commands available in Claude Code
-# /my-utils/hello
-```
-
-## Project Structure
-
-This is a monorepo containing:
-
-- **`cli/`** - Command-line interface for managing Claude commands
-- **`api/`** - Registry API server for hosting and sharing commands
-- **`web/`** - Web interface for browsing and discovering commands
-
-## Quick Start
-
-### Try the Example Package
-```bash
-# Install the CLI globally
-cd cli
+# Or clone and install locally
+git clone https://github.com/drdator/ccm.git
+cd ccm/cli
+npm install
 npm run build
 npm link
+```
 
-# Test with the example package
-cd ../example-commands
-ccm publish --dry    # Preview
-ccm publish          # Actually publish
+### Configure Registry
 
-# Install it somewhere else
-cd /tmp && mkdir test && cd test
-ccm install hello-world
+```bash
+# Use the official registry
+ccm config --registry https://claudecommands.dev/api
+
+# Or run your own registry locally
+ccm config --registry http://localhost:3000/api
+```
+
+### Install Your First Package
+
+```bash
+# Search for available packages
+ccm search
+
+# Install a package
+ccm install hello
+
+# List installed packages
 ccm list
 ```
 
-### Development Setup
+### Use Commands in Claude Code
 
-#### Full Stack Development
+After installation, commands are available in Claude Code with the package namespace:
+
+```
+/hello
+```
+
+## 📦 Key Features
+
+- **🎯 Namespaced Commands**: No conflicts between packages
+- **🔍 Package Discovery**: Browse commands at [claudecommands.dev](https://claudecommands.dev)
+- **📚 Version Management**: Semantic versioning for all packages
+- **🔒 Secure Registry**: JWT authentication and validated publishing
+- **⚡ Fast Performance**: Built on Fastify for maximum speed
+
+## 🛠️ For Package Publishers
+
+### Create a New Package
+
+```bash
+# Initialize a new command package
+mkdir my-commands && cd my-commands
+ccm init --name "my-productivity-tools"
+
+# Create commands in the commands/ directory
+echo "# My First Command" > commands/hello.md
+```
+
+### Publish to Registry
+
+```bash
+# Register an account (first time only)
+ccm register
+
+# Publish your package
+ccm publish
+```
+
+### Example Command File
+
+```markdown
+---
+description: "A friendly greeting command"
+author: "Your Name"
+tags: ["greeting", "hello"]
+---
+
+# Hello Command
+
+Hello! This is my first CCM command.
+
+You can use arguments like this: $ARGUMENTS
+```
+
+## 🏗️ Project Architecture
+
+This is a monorepo containing:
+
+- **`cli/`** - Command-line interface for managing packages
+- **`api/`** - Registry API server (Fastify + SQLite)
+- **`web/`** - Web interface for package discovery (Vite + Vanilla JS)
+
+## 🖥️ Development Setup
+
+### Prerequisites
+
+- Node.js 18+
+- npm 9+
+
+### Full Stack Development
+
 ```bash
 # Install dependencies
 npm install
 
-# Terminal 1: Start API server
-npm run dev:api
-
-# Terminal 2: Start web interface
-npm run dev:web
-
-# Terminal 3: Test CLI
-cd cli && npm run build && npm link
+# Start all services
+npm run dev:api    # API server on :3000
+npm run dev:web    # Web interface on :8080
+npm run dev:cli    # CLI development mode
 ```
 
-#### Individual Components
+### Individual Components
+
 ```bash
 # CLI only
-npm run build:cli
+cd cli && npm run build && npm link
 
 # API only
-npm run dev:api
+cd api && npm run dev
 
 # Web only
-npm run dev:web
+cd web && npm run dev
 ```
 
-## Commands
+### Testing
 
-- `npm run dev:cli` - Run CLI in development mode
-- `npm run dev:api` - Run API server (Native Fastify, auto-creates SQLite DB)
-- `npm run dev:web` - Run web interface (http://localhost:8080)
-- `npm run build` - Build all components
-- `npm run db:seed --workspace=api` - Seed SQLite database with example commands
+```bash
+# Run all tests
+npm test
 
-## API Framework (2025 Modern Stack)
+# Component-specific tests
+npm run test:api
+npm run test:cli
+npm run test:e2e
+```
 
-CCM uses **100% Native Fastify** for maximum performance and modern TypeScript support:
+## 🐳 Docker Deployment
 
-- **Framework**: Fastify 5.4.0 (9.7x faster than Express)
-- **Type Safety**: Full TypeScript integration with automatic request/response validation
-- **Schema Validation**: JSON Schema validation for all endpoints
-- **Security**: @fastify/helmet and @fastify/cors plugins
-- **Performance Monitoring**: Built-in request timing and structured logging
-- **Modern Features**: HTTP/2 support, async/await throughout
+### Quick Start with Docker
 
-### Performance Benefits
-- **Request Speed**: 40-90% faster than Express-based APIs
-- **Schema Validation**: Automatic validation with detailed error messages
-- **Type Safety**: Compile-time checking prevents runtime errors
-- **Modern Architecture**: Built for 2025 development practices
+```bash
+# Clone the repository
+git clone https://github.com/drdator/ccm.git
+cd ccm
+
+# Copy and configure environment
+cp .env.example .env
+# Edit .env with your configuration
+
+# Start services
+docker-compose up -d
+
+# Verify deployment
+curl http://localhost:3000/api/health
+```
+
+### Production Deployment
+
+See [DEPLOY.md](DEPLOY.md) for detailed production deployment instructions including:
+- EC2 setup with SSL/HTTPS
+- Domain configuration
+- Database backups
+- Monitoring setup
+
+## 📚 Documentation
+
+- **[Architecture Guide](CLAUDE.md)** - Detailed system architecture
+- **[Deployment Guide](DEPLOY.md)** - Production deployment instructions
+- **[Update Guide](UPDATE-DEPLOY.md)** - How to update production
+
+## 🔧 API Reference
+
+### Public Endpoints
+
+- `GET /api/commands` - List all packages
+- `GET /api/commands/:name` - Get package details
+- `GET /api/commands/:name/:version` - Get specific version
+- `GET /api/search?q=query` - Search packages
+
+### Authenticated Endpoints
+
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login user
+- `POST /api/commands` - Publish package
+- `PUT /api/commands/:name` - Update package
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Ensure all tests pass
+5. Submit a pull request
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with [Fastify](https://fastify.dev) for high-performance APIs
+- Powered by [Vite](https://vitejs.dev) for modern web development
+- Inspired by npm, pip, and other great package managers
+
+---
+
+**Happy coding with Claude! 🤖**
