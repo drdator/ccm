@@ -32,15 +32,11 @@ services:
     image: ccm-web:latest
     container_name: ccm-web
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"
     depends_on:
       - api
     environment:
-      - API_URL=${API_URL:-http://api:3000}
-    volumes:
-      - ./nginx-ssl:/etc/nginx/ssl:ro
-      - ./nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - API_BASE_URL=https://claudecommands.dev/api
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost/health"]
       interval: 30s
