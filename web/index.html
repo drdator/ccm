@@ -55,17 +55,17 @@
                     <div class="code-content">
                         <div class="code-line">
                             <span class="prompt">$</span>
-                            <span class="command">ccm search git</span>
+                            <span class="command">ccm config --registry https://claudecommands.dev/api</span>
                         </div>
                         <div class="code-line">
                             <span class="prompt">$</span>
-                            <span class="command">ccm install dev-tools</span>
+                            <span class="command">ccm install hello</span>
                         </div>
                         <div class="code-line">
                             <span class="comment"># Now use in Claude Code:</span>
                         </div>
                         <div class="code-line">
-                            <span class="comment"># /dev-tools:git-helper</span>
+                            <span class="comment"># /hello</span>
                         </div>
                     </div>
                 </div>
@@ -82,27 +82,27 @@
                     <div class="step-number">1</div>
                     <h4>Install CCM CLI</h4>
                     <div class="code-block small">
-                        <code>npm install -g ccm-cli</code>
+                        <code>npm install -g https://github.com/drdator/ccm.git</code>
                     </div>
-                    <p>Install the CCM command-line tool globally on your system.</p>
+                    <p>Install the CCM command-line tool globally from GitHub.</p>
                 </div>
                 
                 <div class="step">
                     <div class="step-number">2</div>
-                    <h4>Search & Install</h4>
+                    <h4>Configure & Search</h4>
                     <div class="code-block small">
-                        <code>ccm search git<br>ccm install dev-tools</code>
+                        <code>ccm config --registry https://claudecommands.dev/api<br>ccm search git</code>
                     </div>
-                    <p>Find useful command packages and install them in your project.</p>
+                    <p>Configure the registry and search for command packages.</p>
                 </div>
                 
                 <div class="step">
                     <div class="step-number">3</div>
-                    <h4>Use in Claude Code</h4>
+                    <h4>Install & Use</h4>
                     <div class="code-block small">
-                        <code>/dev-tools:git-helper</code>
+                        <code>ccm install hello<br>/hello</code>
                     </div>
-                    <p>Access installed commands in Claude Code with package namespacing.</p>
+                    <p>Install commands and use them in Claude Code.</p>
                 </div>
             </div>
         </div>
