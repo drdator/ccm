@@ -47,7 +47,7 @@ ccm list
 After installation, commands are available in Claude Code with the package namespace:
 
 ```
-/hello
+/hello:hello
 ```
 
 ## 📦 Key Features
