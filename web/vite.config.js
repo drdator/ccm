@@ -20,6 +20,9 @@ export default defineConfig({
       input: {
         main: './index.html'
       }
-    }
-  }
+    },
+    // Copy config template to dist
+    copyPublicDir: true
+  },
+  publicDir: 'public'
 })

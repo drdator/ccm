@@ -1,0 +1,73 @@
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: ccm-api
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - JWT_SECRET=${JWT_SECRET:-your-256-bit-secret-here}
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost}
+      - RATE_LIMIT_MAX=${RATE_LIMIT_MAX:-100}
+      - DATABASE_PATH=/app/data/ccm-registry.db
+    volumes:
+      - api-data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - ccm-network
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: ccm-web
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    environment:
+      - API_BASE_URL=http://localhost:3000/api
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - ccm-network
+
+  cli:
+    build:
+      context: ./cli
+      dockerfile: Dockerfile
+    container_name: ccm-cli
+    depends_on:
+      - api
+    environment:
+      - CCM_REGISTRY=http://api:3000/api
+    volumes:
+      - cli-config:/home/nodejs/.ccm
+    networks:
+      - ccm-network
+    profiles:
+      - cli
+
+volumes:
+  api-data:
+    driver: local
+  cli-config:
+    driver: local
+
+networks:
+  ccm-network:
+    driver: bridge

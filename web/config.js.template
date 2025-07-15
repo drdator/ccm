@@ -1,0 +1,4 @@
+// Configuration template - will be processed at build time
+window.CCM_CONFIG = {
+    API_BASE_URL: '${API_BASE_URL}'
+};

@@ -1,9 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import jwt from 'jsonwebtoken';
-// Use SQLite models for local development
-const UserModel = process.env.NODE_ENV === 'production' 
-  ? (await import('../models/User.js')).UserModel
-  : (await import('../models/User-sqlite.js')).UserModel;
+// Import SQLite model
+import { UserModel } from '../models/User-sqlite.js';
 
 // Password validation function
 function validatePassword(password: string): string | null {

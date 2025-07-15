@@ -11,7 +11,7 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage --run",
     "test:cleanup": "node cleanup-test-dbs.js",
-    "db:seed": "sqlite3 ccm-registry.db < ../scripts/seed-data.sql"
+    "db:seed": "sqlite3 ccm-registry.db < seed-data.sql"
   },
   "keywords": [
     "claude",

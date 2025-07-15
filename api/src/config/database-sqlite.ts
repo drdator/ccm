@@ -8,10 +8,10 @@ export async function getDatabase() {
   if (!db) {
     const dbFilename = process.env.NODE_ENV === 'test' 
       ? (process.env.TEST_DB_NAME || 'test-ccm-registry.db')
-      : 'ccm-registry.db';
+      : (process.env.DATABASE_PATH || 'ccm-registry.db');
       
     db = await open({
-      filename: join(process.cwd(), dbFilename),
+      filename: dbFilename,
       driver: sqlite3.Database
     });
     
@@ -95,6 +95,39 @@ export async function initializeDatabase() {
   
   // Use console.log for database initialization as logger isn't available yet
   console.log('✅ Database tables created/verified');
+  
+  // Auto-seed database in development mode
+  if (process.env.NODE_ENV === 'development') {
+    try {
+      // Check if data already exists
+      const existingCommands = await db.get('SELECT COUNT(*) as count FROM commands');
+      if (existingCommands.count === 0) {
+        console.log('📦 Seeding database with sample data...');
+        await seedDatabase();
+      }
+    } catch (error) {
+      console.error('⚠️  Database seeding failed:', error);
+    }
+  }
+}
+
+async function seedDatabase() {
+  const db = await getDatabase();
+  const fs = await import('fs');
+  const path = await import('path');
+  
+  try {
+    const seedFile = path.join(process.cwd(), 'seed-data.sql');
+    if (fs.existsSync(seedFile)) {
+      const seedData = fs.readFileSync(seedFile, 'utf8');
+      await db.exec(seedData);
+      console.log('✅ Database seeded successfully');
+    } else {
+      console.log('ℹ️  No seed file found, skipping seeding');
+    }
+  } catch (error) {
+    console.error('❌ Database seeding failed:', error);
+  }
 }
 
 export default getDatabase;

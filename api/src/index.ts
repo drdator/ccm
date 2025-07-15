@@ -13,15 +13,13 @@ declare module 'fastify' {
 // Load environment variables
 dotenv.config();
 
-// Initialize database (SQLite for local development)
-if (process.env.NODE_ENV !== 'production') {
-  import('./config/database-sqlite.js').then(({ initializeDatabase }) => {
-    initializeDatabase().catch((error) => {
-      console.error('Database initialization failed:', error);
-      process.exit(1);
-    });
+// Initialize database (SQLite)
+import('./config/database-sqlite.js').then(({ initializeDatabase }) => {
+  initializeDatabase().catch((error) => {
+    console.error('Database initialization failed:', error);
+    process.exit(1);
   });
-}
+});
 
 const PORT = process.env.PORT || 3000;
 
@@ -120,7 +118,7 @@ await fastify.register(commandRoutes, { prefix: '/api/commands' });
 // Start server
 const start = async () => {
   try {
-    await fastify.listen({ port: Number(PORT), host: 'localhost' });
+    await fastify.listen({ port: Number(PORT), host: '0.0.0.0' });
     fastify.log.info({
       port: PORT,
       environment: process.env.NODE_ENV || 'development',

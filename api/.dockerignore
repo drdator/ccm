@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log
+.env
+.env.local
+dist
+coverage
+.nyc_output
+*.test.ts
+*.spec.ts
+tests
+__tests__
+*.db
+*.db-journal
+.DS_Store
+*.log

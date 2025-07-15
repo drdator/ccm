@@ -1,9 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import jwt from 'jsonwebtoken';
-// Use SQLite models for local development
-const CommandModel = process.env.NODE_ENV === 'production'
-  ? (await import('../models/Command.js')).CommandModel
-  : (await import('../models/Command-sqlite.js')).CommandModel;
+// Import SQLite model
+import { CommandModel } from '../models/Command-sqlite.js';
 
 // Enhanced Fastify schemas with validation
 const listCommandsSchema = {

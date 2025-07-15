@@ -1,0 +1,65 @@
+services:
+  api:
+    image: ccm-api:latest
+    container_name: ccm-api
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - JWT_SECRET=${JWT_SECRET}
+      - CORS_ORIGIN=${CORS_ORIGIN}
+      - RATE_LIMIT_MAX=${RATE_LIMIT_MAX:-100}
+      - DATABASE_PATH=/app/data/ccm-registry.db
+    volumes:
+      - api-data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: always
+    networks:
+      - ccm-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  web:
+    image: ccm-web:latest
+    container_name: ccm-web
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api
+    environment:
+      - API_URL=${API_URL:-http://api:3000}
+    volumes:
+      - ./nginx-ssl:/etc/nginx/ssl:ro
+      - ./nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: always
+    networks:
+      - ccm-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  api-data:
+    driver: local
+
+networks:
+  ccm-network:
+    driver: bridge
