@@ -560,15 +560,38 @@ function createCommandFileHTML(packageName, file) {
     const commandName = fileName.replace(/\.md$/, '');
     const usage = `/${packageName}:${commandName}`;
     
+    // Extract description from frontmatter
+    const description = extractCommandDescription(file.content);
+    
     return `
         <div class="command-file">
             <div class="command-file-name">${escapeHtml(fileName)}</div>
             <div class="command-file-usage">${escapeHtml(usage)}</div>
             <p class="command-file-description">
-                Command file - use this in Claude Code with the above slash command.
+                ${escapeHtml(description || 'No description available')}
             </p>
         </div>
     `;
+}
+
+// Extract description from markdown frontmatter
+function extractCommandDescription(content) {
+    if (!content) return null;
+    
+    // Look for frontmatter (content between --- lines)
+    const frontmatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---/);
+    if (!frontmatterMatch) return null;
+    
+    const frontmatter = frontmatterMatch[1];
+    
+    // Look for description line
+    const descriptionMatch = frontmatter.match(/^description:\s*(.+)$/m);
+    if (descriptionMatch) {
+        // Remove quotes if present
+        return descriptionMatch[1].replace(/^["']|["']$/g, '');
+    }
+    
+    return null;
 }
 
 // Copy install command to clipboard
