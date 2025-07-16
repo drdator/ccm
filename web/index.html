@@ -6,11 +6,12 @@
     <title>CCM - Claude Command Manager</title>
     <meta name="description" content="Discover and share Claude Code commands. A package manager for Claude Code slash commands.">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="config.js"></script>
+    <!-- Config will be loaded at runtime via docker-entrypoint.sh -->
+    <script src="/config.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -352,6 +353,6 @@
         </div>
     </footer>
 
-    <script type="module" src="script.js"></script>
+    <script type="module" src="/script.js"></script>
 </body>
 </html>
