@@ -36,7 +36,7 @@ ccm config --registry http://localhost:3000/api
 ccm search
 
 # Install a package
-ccm install hello
+ccm install hello-world
 
 # List installed packages
 ccm list
@@ -47,7 +47,7 @@ ccm list
 After installation, commands are available in Claude Code with the package namespace:
 
 ```
-/hello:hello
+/hello-world:greet
 ```
 
 ## 📦 Key Features
