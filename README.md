@@ -38,6 +38,9 @@ ccm search
 # Install a package
 ccm install hello-world
 
+# Install specific version
+ccm install hello-world@1.0.0
+
 # List installed packages
 ccm list
 ```
@@ -54,7 +57,7 @@ After installation, commands are available in Claude Code with the package names
 
 - **🎯 Namespaced Commands**: No conflicts between packages
 - **🔍 Package Discovery**: Browse commands at [claudecommands.dev](https://claudecommands.dev)
-- **📚 Version Management**: Semantic versioning for all packages
+- **📚 Version Management**: Semantic versioning with package@version syntax
 - **🔒 Secure Registry**: JWT authentication and validated publishing
 - **⚡ Fast Performance**: Built on Fastify for maximum speed
 
@@ -101,9 +104,10 @@ You can use arguments like this: $ARGUMENTS
 
 This is a monorepo containing:
 
-- **`cli/`** - Command-line interface for managing packages
-- **`api/`** - Registry API server (Fastify + SQLite)
+- **`cli/`** - Command-line interface for managing packages (TypeScript + Commander.js)
+- **`api/`** - Registry API server (Fastify + SQLite + TypeScript)
 - **`web/`** - Web interface for package discovery (Vite + Vanilla JS)
+- **`example-commands/`** - Example command package for testing
 
 ## 🖥️ Development Setup
 
@@ -169,35 +173,28 @@ docker-compose up -d
 curl http://localhost:3000/api/health
 ```
 
-### Production Deployment
-
-See [DEPLOY.md](DEPLOY.md) for detailed production deployment instructions including:
-- EC2 setup with SSL/HTTPS
-- Domain configuration
-- Database backups
-- Monitoring setup
-
 ## 📚 Documentation
 
-- **[Architecture Guide](CLAUDE.md)** - Detailed system architecture
-- **[Deployment Guide](DEPLOY.md)** - Production deployment instructions
-- **[Update Guide](UPDATE-DEPLOY.md)** - How to update production
+- **[Architecture Guide](CLAUDE.md)** - Detailed system architecture and development workflow
 
 ## 🔧 API Reference
 
 ### Public Endpoints
 
-- `GET /api/commands` - List all packages
+- `GET /api/commands` - List all packages (latest versions)
 - `GET /api/commands/:name` - Get package details
-- `GET /api/commands/:name/:version` - Get specific version
-- `GET /api/search?q=query` - Search packages
+- `GET /api/commands/:name/versions` - Get all versions of a package
+- `GET /api/commands/:name/download` - Download package files
+- `GET /api/commands/search?q=query` - Search packages
+- `GET /health` - API health check
 
 ### Authenticated Endpoints
 
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - Login user
 - `POST /api/commands` - Publish package
-- `PUT /api/commands/:name` - Update package
+- `GET /api/auth/me` - Get current user info
+- `POST /api/auth/regenerate-api-key` - Generate new API key
 
 ## 🤝 Contributing
 
