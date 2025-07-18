@@ -38,10 +38,3 @@ export function parseCommandFile(content: string): CommandMetadata {
   return metadata;
 }
 
-export function parseCommandYaml(content: string): any {
-  try {
-    return yaml.parse(content);
-  } catch (error) {
-    throw new Error(`Failed to parse command.yaml: ${error instanceof Error ? error.message : String(error)}`);
-  }
-}
