@@ -82,7 +82,7 @@ export class CommandModel {
       );
     } else {
       return await db.get(
-        'SELECT c.*, u.username as author_username FROM commands c JOIN users u ON c.author_id = u.id WHERE c.name = ? ORDER BY c.published_at DESC LIMIT 1',
+        'SELECT c.*, u.username as author_username FROM commands c JOIN users u ON c.author_id = u.id WHERE c.name = ? ORDER BY c.id DESC LIMIT 1',
         [name]
       );
     }
@@ -92,9 +92,15 @@ export class CommandModel {
     const db = await getDatabase();
     
     return await db.all(
-      `SELECT c.*, u.username as author_username
+      `WITH latest_versions AS (
+         SELECT name, MAX(id) as max_id
+         FROM commands
+         GROUP BY name
+       )
+       SELECT c.*, u.username as author_username
        FROM commands c
        JOIN users u ON c.author_id = u.id
+       JOIN latest_versions lv ON c.name = lv.name AND c.id = lv.max_id
        WHERE c.name LIKE ? OR c.description LIKE ?
        ORDER BY c.downloads DESC, c.published_at DESC
        LIMIT ? OFFSET ?`,
@@ -112,6 +118,38 @@ export class CommandModel {
        ORDER BY c.published_at DESC
        LIMIT ? OFFSET ?`,
       [limit, offset]
+    );
+  }
+
+  static async listLatestVersions(limit = 20, offset = 0): Promise<Command[]> {
+    const db = await getDatabase();
+    
+    return await db.all(
+      `WITH latest_versions AS (
+         SELECT name, MAX(id) as max_id
+         FROM commands
+         GROUP BY name
+       )
+       SELECT c.*, u.username as author_username
+       FROM commands c
+       JOIN users u ON c.author_id = u.id
+       JOIN latest_versions lv ON c.name = lv.name AND c.id = lv.max_id
+       ORDER BY c.downloads DESC, c.published_at DESC
+       LIMIT ? OFFSET ?`,
+      [limit, offset]
+    );
+  }
+
+  static async getAllVersions(name: string): Promise<Command[]> {
+    const db = await getDatabase();
+    
+    return await db.all(
+      `SELECT c.*, u.username as author_username
+       FROM commands c
+       JOIN users u ON c.author_id = u.id
+       WHERE c.name = ?
+       ORDER BY c.id DESC`,
+      [name]
     );
   }
 

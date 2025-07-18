@@ -341,22 +341,29 @@ async function showPackageModal(packageName) {
         document.getElementById('modal-title').textContent = packageName;
         document.querySelector('.modal-body').innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading package details...</p></div>';
         
-        // Fetch package details
-        const response = await fetch(`${API_BASE_URL}/commands/${encodeURIComponent(packageName)}`);
+        // Fetch all versions of the package
+        const versionsResponse = await fetch(`${API_BASE_URL}/commands/${encodeURIComponent(packageName)}/versions`);
         
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        if (!versionsResponse.ok) {
+            throw new Error(`HTTP error! status: ${versionsResponse.status}`);
         }
         
-        const data = await response.json();
-        const command = data.command;
+        const versionsData = await versionsResponse.json();
+        const versions = versionsData.versions;
         
-        // Fetch command files
-        const downloadResponse = await fetch(`${API_BASE_URL}/commands/${encodeURIComponent(packageName)}/download`);
+        if (!versions || versions.length === 0) {
+            throw new Error('No versions found');
+        }
+        
+        // Use the latest version (first in array) as default
+        const selectedVersion = versions[0];
+        
+        // Fetch command files for the selected version
+        const downloadResponse = await fetch(`${API_BASE_URL}/commands/${encodeURIComponent(packageName)}/download?version=${selectedVersion.version}`);
         const downloadData = downloadResponse.ok ? await downloadResponse.json() : null;
         
-        // Update modal content
-        updateModalContent(command, downloadData);
+        // Update modal content with version selector
+        updateModalContentWithVersions(selectedVersion, downloadData, versions);
         
     } catch (err) {
         console.error('Error loading package details:', err);
@@ -367,6 +374,211 @@ async function showPackageModal(packageName) {
             </div>
         `;
     }
+}
+
+// Update modal content with package details and version selector
+function updateModalContentWithVersions(selectedCommand, downloadData, allVersions) {
+    const tags = selectedCommand.tags || [];
+    const files = downloadData?.files || [];
+    
+    // Create metadata sections
+    const metadataItems = [];
+    
+    if (selectedCommand.category) {
+        metadataItems.push(`
+            <div class="metadata-item">
+                <span class="metadata-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2l5 0 2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Category:
+                </span>
+                <span class="metadata-value badge badge-category">${escapeHtml(selectedCommand.category)}</span>
+            </div>
+        `);
+    }
+    
+    if (selectedCommand.license) {
+        metadataItems.push(`
+            <div class="metadata-item">
+                <span class="metadata-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14,2 14,8 20,8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10,9 9,9 8,9"></polyline>
+                    </svg>
+                    License:
+                </span>
+                <span class="metadata-value badge badge-license">${escapeHtml(selectedCommand.license)}</span>
+            </div>
+        `);
+    }
+    
+    if (selectedCommand.repository) {
+        metadataItems.push(`
+            <div class="metadata-item">
+                <span class="metadata-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                    </svg>
+                    Repository:
+                </span>
+                <a href="${escapeHtml(selectedCommand.repository)}" target="_blank" class="metadata-link">
+                    ${escapeHtml(selectedCommand.repository)}
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1-2-2h6"></path>
+                        <polyline points="15,3 21,3 21,9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                </a>
+            </div>
+        `);
+    }
+    
+    if (selectedCommand.homepage) {
+        metadataItems.push(`
+            <div class="metadata-item">
+                <span class="metadata-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                    </svg>
+                    Homepage:
+                </span>
+                <a href="${escapeHtml(selectedCommand.homepage)}" target="_blank" class="metadata-link">
+                    ${escapeHtml(selectedCommand.homepage)}
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1-2-2h6"></path>
+                        <polyline points="15,3 21,3 21,9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                </a>
+            </div>
+        `);
+    }
+    
+    // Add publication stats
+    const publishedDate = new Date(selectedCommand.published_at).toLocaleDateString();
+    const updatedDate = new Date(selectedCommand.updated_at).toLocaleDateString();
+    
+    metadataItems.push(`
+        <div class="metadata-item">
+            <span class="metadata-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                Published:
+            </span>
+            <span class="metadata-value">${publishedDate}</span>
+        </div>
+    `);
+    
+    if (publishedDate !== updatedDate) {
+        metadataItems.push(`
+            <div class="metadata-item">
+                <span class="metadata-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23,4 23,10 17,10"></polyline>
+                        <polyline points="1,20 1,14 7,14"></polyline>
+                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                    </svg>
+                    Updated:
+                </span>
+                <span class="metadata-value">${updatedDate}</span>
+            </div>
+        `);
+    }
+    
+    metadataItems.push(`
+        <div class="metadata-item">
+            <span class="metadata-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7,10 12,15 17,10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Downloads:
+            </span>
+            <span class="metadata-value">${selectedCommand.downloads || 0}</span>
+        </div>
+    `);
+    
+    // Create version selector if multiple versions exist
+    const versionSelector = allVersions.length > 1 ? `
+        <div class="version-selector">
+            <label for="version-select">
+                Version:
+            </label>
+            <select id="version-select" onchange="switchPackageVersion('${escapeHtml(selectedCommand.name)}', this.value)">
+                ${allVersions.map(version => `
+                    <option value="${escapeHtml(version.version)}" ${version.version === selectedCommand.version ? 'selected' : ''}>
+                        v${escapeHtml(version.version)} (${new Date(version.published_at).toLocaleDateString()})
+                    </option>
+                `).join('')}
+            </select>
+        </div>
+    ` : '';
+    
+    document.getElementById('modal-title').textContent = selectedCommand.name;
+    document.querySelector('.modal-body').innerHTML = `
+        <div class="package-info">
+            <div class="package-meta">
+                <span class="package-version">v${escapeHtml(selectedCommand.version)}</span>
+                <span class="package-author">by ${escapeHtml(selectedCommand.author_username || 'Unknown')}</span>
+            </div>
+            ${versionSelector}
+            <p class="package-description">${escapeHtml(selectedCommand.description || 'No description available')}</p>
+            
+            ${metadataItems.length > 0 ? `
+                <div class="package-metadata">
+                    <h5>Package Information</h5>
+                    <div class="metadata-grid">
+                        ${metadataItems.join('')}
+                    </div>
+                </div>
+            ` : ''}
+            
+            ${tags.length > 0 ? `
+                <div class="package-tags" id="modal-tags">
+                    <h5>Tags</h5>
+                    <div class="tags-container">
+                        ${tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+        
+        <div class="install-section">
+            <h4>Installation</h4>
+            <div class="code-block small">
+                <code id="install-command">ccm install ${escapeHtml(selectedCommand.name)}@${escapeHtml(selectedCommand.version)}</code>
+                <button onclick="copyInstallCommand()" class="copy-btn" title="Copy command">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="commands-list">
+            <h4>Commands in this Package</h4>
+            <div id="modal-commands" class="command-files">
+                ${files.length > 0 ? 
+                    files.map(file => createCommandFileHTML(selectedCommand.name, file)).join('') :
+                    '<p>No command files available</p>'
+                }
+            </div>
+        </div>
+    `;
+    
+    // Store versions data for version switching
+    window.currentPackageVersions = allVersions;
 }
 
 // Update modal content with package details
@@ -739,7 +951,44 @@ window.addEventListener('unhandledrejection', (event) => {
     }
 });
 
+// Switch package version in modal
+async function switchPackageVersion(packageName, version) {
+    try {
+        // Show loading indicator
+        const modalBody = document.querySelector('.modal-body');
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'loading-overlay';
+        loadingDiv.innerHTML = '<div class="spinner"></div>';
+        modalBody.appendChild(loadingDiv);
+        
+        // Find the selected version from stored data
+        const selectedVersion = window.currentPackageVersions.find(v => v.version === version);
+        if (!selectedVersion) {
+            throw new Error('Version not found');
+        }
+        
+        // Fetch command files for the selected version
+        const downloadResponse = await fetch(`${API_BASE_URL}/commands/${encodeURIComponent(packageName)}/download?version=${version}`);
+        const downloadData = downloadResponse.ok ? await downloadResponse.json() : null;
+        
+        // Remove loading indicator
+        modalBody.removeChild(loadingDiv);
+        
+        // Update modal content
+        updateModalContentWithVersions(selectedVersion, downloadData, window.currentPackageVersions);
+        
+    } catch (err) {
+        console.error('Error switching package version:', err);
+        // Remove loading indicator if it exists
+        const loadingDiv = document.querySelector('.loading-overlay');
+        if (loadingDiv) {
+            loadingDiv.remove();
+        }
+    }
+}
+
 // Export functions for global access
 window.loadCommands = loadCommands;
 window.closeModal = closeModal;
 window.copyInstallCommand = copyInstallCommand;
+window.switchPackageVersion = switchPackageVersion;

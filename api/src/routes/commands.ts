@@ -351,7 +351,7 @@ const authenticateHook = async (request: FastifyRequest, reply: FastifyReply) =>
 };
 
 export default async function commandRoutes(fastify: FastifyInstance) {
-  // List all commands
+  // List all commands (grouped by name, showing latest version)
   fastify.get('/', {
     schema: listCommandsSchema
   }, async (request: FastifyRequest<{
@@ -361,7 +361,7 @@ export default async function commandRoutes(fastify: FastifyInstance) {
       const limit = Math.min(request.query.limit || 20, 100);
       const offset = request.query.offset || 0;
       
-      const commands = await CommandModel.list(limit, offset);
+      const commands = await CommandModel.listLatestVersions(limit, offset);
       
       // Add tags to each command
       const commandsWithTags = await Promise.all(
@@ -416,6 +416,40 @@ export default async function commandRoutes(fastify: FastifyInstance) {
           offset,
           total: commandsWithTags.length
         }
+      });
+    } catch (error: any) {
+      request.log.error(error);
+      return reply.status(500).send({
+        error: 'Internal server error'
+      });
+    }
+  });
+
+  // Get all versions of a package
+  fastify.get('/:name/versions', async (request: FastifyRequest<{
+    Params: { name: string }
+  }>, reply) => {
+    try {
+      const { name } = request.params;
+      
+      const versions = await CommandModel.getAllVersions(name);
+      if (!versions || versions.length === 0) {
+        return reply.status(404).send({
+          error: 'Package not found'
+        });
+      }
+      
+      // Add tags to each version
+      const versionsWithTags = await Promise.all(
+        versions.map(async (cmd: any) => ({
+          ...cmd,
+          tags: await CommandModel.getTags(cmd.id)
+        }))
+      );
+      
+      return reply.status(200).send({
+        name,
+        versions: versionsWithTags
       });
     } catch (error: any) {
       request.log.error(error);

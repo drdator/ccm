@@ -10,7 +10,7 @@ interface InstallOptions {
   force?: boolean;
 }
 
-export async function install(commandName?: string, options: InstallOptions = {}) {
+export async function install(commandSpec?: string, options: InstallOptions = {}) {
   const apiClient = new ApiClient();
   const configManager = new ConsumerConfigManager();
 
@@ -24,9 +24,22 @@ export async function install(commandName?: string, options: InstallOptions = {}
   const commandsDir = configManager.getCommandsDir();
 
   try {
-    if (commandName) {
-      // Install specific command
-      await installCommand(commandName, options, apiClient, configManager);
+    if (commandSpec) {
+      // Parse package@version syntax
+      const atIndex = commandSpec.lastIndexOf('@');
+      let commandName: string;
+      let version: string | undefined;
+      
+      if (atIndex > 0) {
+        commandName = commandSpec.substring(0, atIndex);
+        version = commandSpec.substring(atIndex + 1);
+      } else {
+        commandName = commandSpec;
+        version = options.version;
+      }
+      
+      // Install specific command with parsed version
+      await installCommand(commandName, { ...options, version }, apiClient, configManager);
     } else {
       // Install all dependencies from ccm.json
       await installDependencies(projectConfig, apiClient, configManager);
